@@ -1,0 +1,36 @@
+{
+  "name": "christian-connect-api",
+  "version": "1.0.0",
+  "description": "This is the API For Christian Connect Social Media Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/its-nedum/christian-connect-api.git"
+  },
+  "author": "Chinedu Emesue",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/its-nedum/christian-connect-api/issues"
+  },
+  "homepage": "https://github.com/its-nedum/christian-connect-api#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cloudinary": "^1.17.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^7.14.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^6.2.2",
+    "nodemon": "^2.0.1"
+  }
+}
