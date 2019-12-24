@@ -21,12 +21,16 @@ app.use((req, res, next) => {
   next();
 });
 
-//test route
-app.get('/', (req, res) => {
+//Home route
+app.get('/api/v1/', (req, res) => {
     res.json({
         message: "Welcome to Christian Connect Api"
     })
 })
+
+//MUSIC ROUTE
+const musicRouter = require('./routes/music')
+app.use('/api/v1', musicRouter)
 
 
 module.exports = app;
