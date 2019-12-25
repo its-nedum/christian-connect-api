@@ -28,6 +28,10 @@ app.get('/api/v1/', (req, res) => {
     })
 })
 
+// ADMINS ROUTE
+const adminRouter = require('./routes/admins')
+app.use('/api/v1', adminRouter)
+
 //MUSIC ROUTE
 const musicRouter = require('./routes/music')
 app.use('/api/v1', musicRouter)
