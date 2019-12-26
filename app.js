@@ -40,5 +40,9 @@ app.use('/api/v1', adminRouter)
 const musicRouter = require('./routes/music')
 app.use('/api/v1', musicRouter)
 
+//VIDEO ROUTE
+const videoRouter = require('./routes/video')
+app.use('/api/v1', videoRouter)
+
 
 module.exports = app;
