@@ -52,4 +52,8 @@ app.use('/api/v1', lyricRouter)
 const eventRouter = require('./routes/event')
 app.use('/api/v1', eventRouter)
 
+//JOB ROUTE
+const jobRouter = require('./routes/jobs')
+app.use('/api/v1', jobRouter)
+
 module.exports = app;
