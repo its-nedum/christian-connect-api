@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const getUserName = require('../helpers/getUserName');
 
 //DATABASE CONNECTION
 const client = require('../database/dbconnect')
@@ -58,7 +59,7 @@ router.get('/music/:musicId', async (req, res) => {
 router.post('/music/:musicId/comment', async (req, res) => {
     const musicId = req.params.musicId;
     const comment = req.body.comment;
-    const commentBy = 'Chinedu Emesue' //getUserName()
+    const commentBy = 'Chinedu Emesue' //await getUserName(req)
 
     try {
         client.query("INSERT INTO music_comments(comment, comment_by, music_id, created_at)VALUES($1, $2, $3, current_timestamp)",

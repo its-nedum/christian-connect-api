@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fileUpload = require('express-fileupload')
+const getAdminName = require('../helpers/getAdminName')
 
 
 //DATABASE CONNECTION
@@ -25,7 +26,7 @@ router.post('/music',  async (req, res) => {
     const musicTitle = req.body.musicTitle;
     const musicAbout = req.body.musicAbout;
     const category = 'Music';
-    const uploadedBy = 'Admin' //getAdmin();
+    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
     const image = req.files.image
     const music = req.files.music
 

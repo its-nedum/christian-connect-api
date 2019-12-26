@@ -28,6 +28,10 @@ app.get('/api/v1/', (req, res) => {
     })
 })
 
+//ADMIN AUTH ROUTE
+const adminAuthRouter = require('./routes/adminAuth')
+app.use('/api/v1', adminAuthRouter)
+
 // ADMINS ROUTE
 const adminRouter = require('./routes/admins')
 app.use('/api/v1', adminRouter)
