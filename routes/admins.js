@@ -3,7 +3,6 @@ const router = express.Router();
 const fileUpload = require('express-fileupload')
 const getAdminName = require('../helpers/getAdminName')
 
-
 //DATABASE CONNECTION
 const client = require('../database/dbconnect')
 
@@ -89,16 +88,16 @@ router.post('/video', async (req, res) => {
     const category = 'Video';
     const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
     try{
-    //Check if song already exist
+    //Check if video already exist
     await client.query("SELECT * FROM video WHERE video_title = $1", [videoTitle], async (err, result) => {
         if(err) { console.log(err) }
-        //If song already exist do this
+        //If video already exist do this
         if(result.rows[0]){
             return res.status(400).json({
                 message: 'Video already exist'
             })
         } else {
-            //If song does not exist in database then we add it
+            //If video does not exist in database then we add it
             let urls = [];
 
             //Save the media files in an array
@@ -214,8 +213,9 @@ router.post('/event', async (req, res) => {
                   }
 
                 await cloudinary.uploader.upload(image.tempFilePath, async (err, result) => {
+                    if(err){console.log(err)}
                         let image_url = result.url;
-                        
+
                     await client.query("INSERT INTO event(theme,organizer,ministering,venue,start_date,end_date,time,enquiry,comment,image_url,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, current_timestamp)", 
                         [theme,organizer,ministering,venue,startDate,endDate,time,enquiry,comment,image_url,category, uploadedBy], 
                         (err) => {
@@ -240,5 +240,44 @@ router.post('/event', async (req, res) => {
         console.log(err)
     }
 })
+
+//POST JOB TO THE DATABASE
+router.post('/job', async (req, res) => {
+    const position = req.body.position;
+    const company = req.body.company;
+    const location = req.body.location;
+    const salary = req.body.salary;
+    const jobType = req.body.jobType;
+    const deadline = req.body.deadline;
+    const summary = req.body.summary;
+    const description = req.body.description;
+    const requirement = req.body.requirement;
+    const apply = req.body.apply;
+    const category = 'job'
+    const uploadedBy = 'Chinedu Emesue'; // await getAdminName(req)
+    try{
+    await client.query("INSERT INTO job(position,company,location,salary,job_type,deadline,summary,description,requirement,apply,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,current_timestamp)",
+                 [position,company,location,salary,jobType,deadline,summary,description,requirement,apply,category,uploadedBy], (err) => {
+                     if(err) { console.log(err) }
+
+                     res.status(201).json({
+                         status: 'success',
+                         message: 'Job added successfully',
+                         data: {
+                             position,
+                             company,
+                             salary,
+                             deadline,
+                             category
+                         }
+                     })
+                 })
+
+    }catch(err){
+        console.log(err)
+    }
+
+})
+
 
 module.exports = router;
