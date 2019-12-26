@@ -48,4 +48,8 @@ app.use('/api/v1', videoRouter)
 const lyricRouter = require('./routes/lyric')
 app.use('/api/v1', lyricRouter)
 
+//EVENT ROUTE
+const eventRouter = require('./routes/event')
+app.use('/api/v1', eventRouter)
+
 module.exports = app;
