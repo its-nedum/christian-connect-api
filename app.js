@@ -44,5 +44,8 @@ app.use('/api/v1', musicRouter)
 const videoRouter = require('./routes/video')
 app.use('/api/v1', videoRouter)
 
+//LYRIC ROUTE
+const lyricRouter = require('./routes/lyric')
+app.use('/api/v1', lyricRouter)
 
 module.exports = app;

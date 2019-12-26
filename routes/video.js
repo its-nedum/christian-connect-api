@@ -55,7 +55,7 @@ router.get('/video/:videoId', async (req, res) => {
     }
 })
 
-//POST A COMMENT ON A SONG
+//POST A COMMENT ON A VIDEO
 router.post('/video/:videoId/comment', async (req, res) => {
     const videoId = req.params.videoId;
     const comment = req.body.comment;
