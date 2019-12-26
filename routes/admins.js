@@ -29,7 +29,7 @@ router.post('/music',  async (req, res) => {
     const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
     const image = req.files.image
     const music = req.files.music
-
+    try{
     //Check if song already exist
     await client.query("SELECT * FROM music WHERE music_title = $1", [musicTitle], async (err, result) => {
         if(err) { console.log(err) }
@@ -75,7 +75,9 @@ router.post('/music',  async (req, res) => {
                             })
         }
     })
-
+    }catch(err){
+        console.log(err)
+    }
 })
 
 //POST A VIDEO TO DATABASE
@@ -86,7 +88,7 @@ router.post('/video', async (req, res) => {
     const video = req.files.video;
     const category = 'Video';
     const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
-
+    try{
     //Check if song already exist
     await client.query("SELECT * FROM video WHERE video_title = $1", [videoTitle], async (err, result) => {
         if(err) { console.log(err) }
@@ -132,11 +134,52 @@ router.post('/video', async (req, res) => {
                             })
         }
     })
+    }catch(err){
+        console.log(err)
+    }
 
 })
 
 
+//POST LYRIC TO DATABASE
+router.post('/lyric', async (req, res) => {
+    lyricTitle = req.body.lyricTitle;
+    lyric = req.body.lyric;
+    const category = 'Lyric';
+    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
+    try{
+    await client.query("SELECT * FROM lyric WHERE lyric_title = $1", [lyricTitle], async (err, result) => {
+        if(err) { console.log(err)}
 
+        //If lyric exist do this
+        if(result.rows[0]){
+            return res.status(400).json({
+                message: 'Lyric already exist'
+            })
+        } else{
+            //If lyric does not exist then we save it
+            await client.query("INSERT INTO lyric(lyric_title, lyric, category, uploaded_by, created_at)VALUES($1,$2,$3,$4, current_timestamp)",
+                        [lyricTitle, lyric, category, uploadedBy], (err) => {
+                            if(err) {console.log(err)}
+
+                            res.status(201).json({
+                                status: 'success',
+                                message: 'Lyric added successfully',
+                                data: {
+                                    lyricTitle,
+                                    lyric,
+                                    category,
+                                    uploadedBy,
+                                    created_at: Date.now()
+                                }
+                            })
+                        })
+        }
+    })
+    }catch(err){
+        console.log(err)
+    }
+})
 
 
 
