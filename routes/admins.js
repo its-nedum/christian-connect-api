@@ -181,6 +181,64 @@ router.post('/lyric', async (req, res) => {
     }
 })
 
+//POST EVENT TO THE DATABASE
+router.post('/event', async (req, res) => {
+    const theme = req.body.theme;
+    const organizer = req.body.organizer;
+    const ministering = req.body.ministering;
+    const venue = req.body.venue;
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const time = req.body.time;
+    const enquiry = req.body.enquiry;
+    const comment = req.body.comment;
+    const image = req.files.image;
+    const category = 'Event';
+    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req)
+    try{
+        //check if event already exist
+        await client.query("SELECT * FROM event WHERE theme = $1", [theme], async (err, result) => {
+            if(err) {console.log(err)}
+            //If event exist do this
+            if(result.rows[0]){
+                return res.status(400).json({
+                    message: 'Event already exist'
+                })
 
+            } else {
+                //Save event image to cloudinary
+                if(image.mimetype !== 'image/jpg' || image.mimetype !== 'image/png') {
+                    return res.status(415).json({
+                        message: 'Please upload a image file',  
+                        })
+                  }
+
+                await cloudinary.uploader.upload(image.tempFilePath, async (err, result) => {
+                        let image_url = result.url;
+                        
+                    await client.query("INSERT INTO event(theme,organizer,ministering,venue,start_date,end_date,time,enquiry,comment,image_url,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, current_timestamp)", 
+                        [theme,organizer,ministering,venue,startDate,endDate,time,enquiry,comment,image_url,category, uploadedBy], 
+                        (err) => {
+                            if(err) {console.log(err)}
+
+                            res.status(201).json({
+                                status: 'success',
+                                message: 'Event added successfully',
+                                data: {
+                                    theme,
+                                    organizer,
+                                    venue,
+                                    image_url
+                                }
+                            })
+                    })
+                })
+
+            }
+        })
+    }catch(err){
+        console.log(err)
+    }
+})
 
 module.exports = router;
