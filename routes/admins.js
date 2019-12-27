@@ -204,7 +204,7 @@ router.post('/event', async (req, res) => {
                     message: 'Event already exist'
                 })
 
-            } else { console.log(image)
+            } else { 
                 //Save event image to cloudinary
                 // if(image.mimetype !== 'image/jpg' || image.mimetype !== 'image/png') {
                 //     return res.status(415).json({
