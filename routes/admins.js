@@ -44,7 +44,7 @@ router.post('/music',  async (req, res) => {
             //Save the media files in an array
             let media = [image.tempFilePath, music.tempFilePath];
             for(let singleTemp of media){
-              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto'}, async (err, result) => {
+              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/music'}, async (err, result) => {
                     if(err){
                         console.log(err)
                     }
@@ -103,7 +103,7 @@ router.post('/video', async (req, res) => {
             //Save the media files in an array
             let media = [image.tempFilePath, video.tempFilePath];
             for(let singleTemp of media){
-              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto'}, async (err, result) => {
+              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, async (err, result) => {
                     if(err){
                         console.log(err)
                     }
@@ -204,15 +204,15 @@ router.post('/event', async (req, res) => {
                     message: 'Event already exist'
                 })
 
-            } else {
+            } else { console.log(image)
                 //Save event image to cloudinary
-                if(image.mimetype !== 'image/jpg' || image.mimetype !== 'image/png') {
-                    return res.status(415).json({
-                        message: 'Please upload a image file',  
-                        })
-                  }
+                // if(image.mimetype !== 'image/jpg' || image.mimetype !== 'image/png') {
+                //     return res.status(415).json({
+                //         message: 'Please upload a image file',  
+                //         })
+                //   }
 
-                await cloudinary.uploader.upload(image.tempFilePath, async (err, result) => {
+                await cloudinary.uploader.upload(image.tempFilePath, {folder: 'Christian Connect/event'}, async (err, result) => {
                     if(err){console.log(err)}
                         let image_url = result.secure_url;
 
