@@ -44,11 +44,11 @@ router.post('/music',  async (req, res) => {
             //Save the media files in an array
             let media = [image.tempFilePath, music.tempFilePath];
             for(let singleTemp of media){
-              await  cloudinary.uploader.upload(singleTemp, async (err, result) => {
+              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto'}, async (err, result) => {
                     if(err){
                         console.log(err)
                     }
-                   await urls.push(result.url)
+                   await urls.push(result.secure_url)
                 })
               
             }
@@ -103,11 +103,11 @@ router.post('/video', async (req, res) => {
             //Save the media files in an array
             let media = [image.tempFilePath, video.tempFilePath];
             for(let singleTemp of media){
-              await  cloudinary.uploader.upload(singleTemp, async (err, result) => {
+              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto'}, async (err, result) => {
                     if(err){
                         console.log(err)
                     }
-                   await urls.push(result.url)
+                   await urls.push(result.secure_url)
                 })
               
             }
@@ -214,7 +214,7 @@ router.post('/event', async (req, res) => {
 
                 await cloudinary.uploader.upload(image.tempFilePath, async (err, result) => {
                     if(err){console.log(err)}
-                        let image_url = result.url;
+                        let image_url = result.secure_url;
 
                     await client.query("INSERT INTO event(theme,organizer,ministering,venue,start_date,end_date,time,enquiry,comment,image_url,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, current_timestamp)", 
                         [theme,organizer,ministering,venue,startDate,endDate,time,enquiry,comment,image_url,category, uploadedBy], 
