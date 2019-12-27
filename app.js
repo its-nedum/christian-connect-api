@@ -56,4 +56,8 @@ app.use('/api/v1', eventRouter)
 const jobRouter = require('./routes/jobs')
 app.use('/api/v1', jobRouter)
 
+//ADMIN DASHBOARD EXTRA ROUTE
+const adminDashboard = require('./routes/adminDashboard')
+app.use('/api/v1', adminDashboard)
+
 module.exports = app;
