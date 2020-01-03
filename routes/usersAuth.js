@@ -16,6 +16,8 @@ const Users = require('../models/Users')
 //USER REGISTER
 router.post('/signup', async (req, res) => {
     let { firstname, lastname, email, username, password, telephone, state, gender, birthdate} = req.body;
+    email = email.toLowerCase();
+    username = username.toLowerCase()
     //Input validation
     if(!email || !username){
         return res.status(200).json({
@@ -34,12 +36,12 @@ router.post('/signup', async (req, res) => {
             //Check if username exist
             Users.findOne({
                 where: { username }
-            }).then( (username) => {
-                if(username){
+            }).then( (nickname) => {
+                if(nickname){ 
                     return res.status(200).json({
                         message: "Username is taken"
                     })
-                }else{
+                }else{ 
                     //Hash the user password
                     bcrypt.hash(password, 8).then(
                         (hash) => {
@@ -56,6 +58,7 @@ router.post('/signup', async (req, res) => {
                                 birthdate
                             }).then( (user) => {
                                 const name = firstname + ' ' + lastname;
+                                
                                 const token = jwt.sign({name, email, username}, process.env.SECRET_TOKEN, {expiresIn: '7d'})
                                 res.status(201).json({
                                     status: 'User created successfully',
@@ -80,7 +83,7 @@ router.post('/signup', async (req, res) => {
 //USER LOGIN
 router.post('/signin', async (req, res) => {
     let { email, password} = req.body
-
+    email = email.toLowerCase();
     //Perform validation
     if(!email || !password){
        return res.status(400).json({
@@ -142,6 +145,9 @@ router.post('/signin', async (req, res) => {
 
 //USER UPDATE ACCOUNT
 
+
 //USER UPDATE PASSWORD
+
+//GET USER PROFILE
 
 module.exports = router
