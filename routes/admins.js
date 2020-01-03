@@ -25,7 +25,7 @@ router.post('/music',  async (req, res) => {
     const musicTitle = req.body.musicTitle;
     const musicAbout = req.body.musicAbout;
     const category = 'Music';
-    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
+    const uploadedBy = await getAdminName(req);
     const image = req.files.image
     const music = req.files.music
     try{
@@ -86,7 +86,7 @@ router.post('/video', async (req, res) => {
     const image = req.files.image;
     const video = req.files.video;
     const category = 'Video';
-    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
+    const uploadedBy = await getAdminName(req);
     try{
     //Check if video already exist
     await client.query("SELECT * FROM video WHERE video_title = $1", [videoTitle], async (err, result) => {
@@ -142,10 +142,10 @@ router.post('/video', async (req, res) => {
 
 //POST LYRIC TO DATABASE
 router.post('/lyric', async (req, res) => {
-    lyricTitle = req.body.lyricTitle;
-    lyric = req.body.lyric;
+    const  lyricTitle = req.body.lyricTitle;
+    const  lyric = req.body.lyric;
     const category = 'Lyric';
-    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req);
+    const uploadedBy = await getAdminName(req);
     try{
     await client.query("SELECT * FROM lyric WHERE lyric_title = $1", [lyricTitle], async (err, result) => {
         if(err) { console.log(err)}
@@ -193,7 +193,7 @@ router.post('/event', async (req, res) => {
     const comment = req.body.comment;
     const image = req.files.image;
     const category = 'Event';
-    const uploadedBy = 'Chinedu Emesue' //await getAdminName(req)
+    const uploadedBy = await getAdminName(req)
     try{
         //check if event already exist
         await client.query("SELECT * FROM event WHERE theme = $1", [theme], async (err, result) => {
@@ -254,7 +254,7 @@ router.post('/job', async (req, res) => {
     const requirement = req.body.requirement;
     const apply = req.body.apply;
     const category = 'job'
-    const uploadedBy = 'Chinedu Emesue'; // await getAdminName(req)
+    const uploadedBy = await getAdminName(req)
     try{
     await client.query("INSERT INTO job(position,company,location,salary,job_type,deadline,summary,description,requirement,apply,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,current_timestamp)",
                  [position,company,location,salary,jobType,deadline,summary,description,requirement,apply,category,uploadedBy], (err) => {

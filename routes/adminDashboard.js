@@ -21,9 +21,7 @@ const router = express.Router();
 const client = require('../database/dbconnect')
 
 router.get('/admin-extra', async(req, res) => {
-    const reportHolder = [];
-    const musicHolder = []
-    const videoHolder = []
+    
     try{
         //For music
         await client.query("SELECT id, music_title, created_at, uploaded_by FROM music ORDER BY id DESC", async (err, result) => {

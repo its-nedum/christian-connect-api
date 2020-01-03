@@ -4,9 +4,6 @@ require('dotenv').config();
 const cors = require('cors')
 const app = express();
 
-//Setup body-parser middleware
-app.use(bodyParser.urlencoded({ extended: true}));
-app.use(bodyParser.json());
 
 //CORS - This allows access from different origin to my API
 app.use(cors({
@@ -21,18 +18,17 @@ app.use((req, res, next) => {
   next();
 });
 
-//Home route
-app.get('/api/v1/', (req, res) => {
-    res.json({
-        message: "Welcome to Christian Connect Api"
-    })
-})
-
-
+//Setup body-parser middleware
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.json());
 
 // ADMINS ROUTE
 const adminRouter = require('./routes/admins')
 app.use('/api/v1', adminRouter)
+
+//USER AUTH ROUTE
+const usersAuthRouter = require('./routes/usersAuth')
+app.use('/api/v1', usersAuthRouter)
 
 //MUSIC ROUTE
 const musicRouter = require('./routes/music')
@@ -61,5 +57,16 @@ app.use('/api/v1', adminDashboard)
 //ADMIN AUTH ROUTE
 const adminAuthRouter = require('./routes/adminAuth')
 app.use('/api/v1', adminAuthRouter)
+
+//Home route
+app.get('/api/v1/', (req, res) => {
+  res.json({
+      message: "Welcome to Christian Connect API"
+  })
+})
+
+
+
+
 
 module.exports = app;
