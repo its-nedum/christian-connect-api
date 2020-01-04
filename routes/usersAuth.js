@@ -3,7 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fileUpload = require('express-fileupload')
-const Op = require('sequelize').Op;
+const getUserId = require('../helpers/getUserId')
+const authenticate = require('../middleware/authenticate')
 
 //IMPORT DATABASE AND MODEL
 const db = require('../database/sequelizeConnect')
@@ -72,7 +73,8 @@ router.post('/signup', async (req, res) => {
                                 birthdate
                             }).then( (user) => {
                                 const name = firstname + ' ' + lastname;
-                                const token = jwt.sign({name, email, username}, process.env.SECRET_TOKEN, {expiresIn: '7d'})
+                                let userId = user.id;
+                                const token = jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'})
                                 res.status(201).json({
                                     status: 'User created successfully',
                                     data: user,
@@ -129,7 +131,8 @@ router.post('/signin', async (req, res) => {
                     //Prepare JWT payload
                     let name = user.firstname + ' ' + user.lastname;
                     let username = user.username;
-                    jwt.sign({name, email, username}, process.env.SECRET_TOKEN, {expiresIn: '7d'}, (err, token) => {
+                    let userId = user.id;
+                    jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'}, (err, token) => {
                         if(err) { console.log(err) }
 
                         res.status(200).json({
@@ -150,18 +153,17 @@ router.post('/signin', async (req, res) => {
             })
         }
 
-
     }).catch( (err) => console.log(err))
-
 
 })
 
+
 //USER UPDATE ACCOUNT (NOTE: User can not update their email or username)
-router.post('/user/:userId/profile', async (req, res) => {
+router.post('/update-profile', authenticate, async (req, res) => {
     let {firstname, lastname, telephone, state, gender, 
          birthdate, country, city, relationship_status,
          work, school, about_me } = req.body;
-    const id = req.params.userId;
+    const id = await getUserId(req);
     
     Users.update(
         {
@@ -192,17 +194,82 @@ router.post('/user/:userId/profile', async (req, res) => {
 })
 
 //USER UPLAOD PROFILE PICTURE
-router.post('/avatar', async (req, res) => {
+router.post('/avatar', authenticate, async (req, res) => {
     let avatar = req.files.avatar;
+    const userId = await getUserId(req)
+
+    if(avatar.mimetype !== 'image/jpeg' || avatar.mimetype !== 'image/png' || avatar.mimetype !== 'image/jpg') {
+        return res.status(415).json({
+            message: 'Please upload a image file',  
+            })
+      }
+
+      cloudinary.uploader.upload(avatar.tempFilePath, async (err, result) => {
+          if(err) { console.log(err) }
+            Users.update({ avatar: result.secure_url},
+                {where: {userId}}
+                ).then( (user) => {
+                    res.status(201).json({
+                        status: "Profile picture updated successfully"
+                    })
+                }).catch( (err) => {
+                    res.status(500).json({
+                        error: "Something went wrong, please try again later"
+                    })
+                })
+      }) 
 })
 
-//USER UPDATE PROFILE PICTURE
+
 
 //USER UPDATE PASSWORD
+router.post('/change-password', authenticate, async (req, res) => {
+    let {current_password, new_password, confirm_password} = req.body
+    const userId = await getUserId(req)
+    //Check whether new password match confirm password
+    if(new_password !== confirm_password){
+        return res.status(500).json({
+            message: "Password does not match"
+        })
+    }
+
+    Users.findOne({
+        where: {id: userId}
+    }).then( (user) => {
+        let dbpassword = user.password;
+        bcrypt.compare(current_password, dbpassword).then(
+            (valid) => {
+                if(valid == false){
+                    return res.status(400).json({message: 'The password you provided is incorrect'})
+                }
+                bcrypt.hash(new_password, 8).then(
+                    (hash) => {
+                        Users.update({password: hash},
+                            {where: {id: userId}}
+                            ).then( () => {
+                                res.status(201).json({
+                                    status: "Password updated successfully"
+                                })
+                            }).catch( err => {
+                                res.status(500).json({
+                                    error: "Something went wrong, please try again later"
+                                })
+                            })
+                    }
+                )
+            }
+        )
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
+
+})
 
 //GET USER PROFILE
-router.get('/user/:userId', async (req, res) => {
-    const id = req.params.userId;
+router.get('/user-details', authenticate, async (req, res) => {
+    const id = await getUserId(req) //req.params.userId;
     //Find and return the user account with id = userId
     Users.findOne({
         where: { id }
@@ -218,5 +285,6 @@ router.get('/user/:userId', async (req, res) => {
 
 })
 
+//USER UPDATE PROFILE PICTURE
 
 module.exports = router
