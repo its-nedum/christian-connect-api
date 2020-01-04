@@ -88,10 +88,18 @@ router.post('/signup', async (req, res) => {
                     })
 
                 }
-            }).catch( (err) => console.log(err))
+            }).catch( (err) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later"
+                })
+            })
         }
         
-    }).catch( (err) => console.log(err))
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
     
 })
 
@@ -115,7 +123,7 @@ router.post('/signin', async (req, res) => {
     //Check if user account exists
     Users.findOne({
         where: { email }
-    }).then( user => {
+    }).then( (user) => {
         if(user == null){
             return res.status(400).json({
                 message: 'The credentials you provided does not exist'
@@ -129,9 +137,9 @@ router.post('/signin', async (req, res) => {
                         return res.status(400).json({message: 'The credentials you provided is incorrect'}) 
                     }
                     //Prepare JWT payload
-                    let name = user.firstname + ' ' + user.lastname;
-                    let username = user.username;
-                    let userId = user.id;
+                    const name = user.firstname + ' ' + user.lastname;
+                    const username = user.username;
+                    const userId = user.id;
                     jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'}, (err, token) => {
                         if(err) { console.log(err) }
 
@@ -153,7 +161,11 @@ router.post('/signin', async (req, res) => {
             })
         }
 
-    }).catch( (err) => console.log(err))
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
 
 })
 
