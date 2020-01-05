@@ -16,7 +16,10 @@ router.get('/music',  async (req, res) => {
         ]
     }).then( (music) => {
         if(!music){
-            let music = "No music posted yet"
+            return res.status(200).json({
+                status: "success",
+                data: "No music posted yet"
+            })
         }
 
         res.status(200).json({

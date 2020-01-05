@@ -2,85 +2,109 @@ const express = require('express');
 const router = express.Router();
 const getUserName = require('../helpers/getUserName');
 
-//DATABASE CONNECTION
-const client = require('../database/dbconnect')
+//Import Models
+const Videos = require('../models/Videos')
+const VideoComments = require('../models/VideoComments')
  
 
 //GET ALL VIDEO FROM THE DATABASE
 router.get('/video',  async (req, res) => {
-    try{
-        client.query("SELECT * FROM video ORDER BY id DESC", async (err, result) => {
-            if(err){ console.log(err) }
-
-            res.status(200).json({
-                status: 'success',
-                data: result.rows
+    Videos.findAll({
+        order: [
+            ['id', 'DESC']
+        ]
+    }).then( (video) => {
+        if(!video){
+            return res.status(200).json({
+                status: "success",
+                data: "No video posted yet"
             })
+        }
+
+        res.status(200).json({
+            status: "success",
+            data: video
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
+        })
+    })
     
 })
 
 //GET A SINGLE VIDEO FROM DATABASE AND ALL ITS COMMENTS
 router.get('/video/:videoId', async (req, res) => {
     const videoId = req.params.videoId;
-    try{
-    await  client.query("SELECT * FROM video WHERE id = $1", [videoId], async (err, result) => {
-            if(err) { console.log(err) }
 
-        await client.query("SELECT * FROM video_comments WHERE video_id = $1 ORDER BY id DESC", [videoId], async (err, comments) => {
-            if(err) { console.log(err) }
+    Videos.findOne({
+        where: { id: videoId }
+    }).then( (video) => {
+        if(!video){
+            return res.status(200).json({
+                status: "success",
+                data: "No video posted yet"
+            })
+        }
+
+        VideoComments.findAll({
+            where: { video_id: videoId},
+            order: [
+                ['id', 'DESC']
+            ]
+        }).then( (comments) => {
+            if(!comments){
+                comments = "No comment posted yet"
+            }
 
             res.status(200).json({
-                status: 'success',
+                status: "success",
                 data: {
-                    videoId: result.rows[0].id,
-                    videoTitle: result.rows[0].video_title,
-                    videoAbout: result.rows[0].video_about,
-                    imageUrl: result.rows[0].image_url,
-                    videoUrl: result.rows[0].video_url,
-                    category: result.rows[0].category,
-                    uploadedBy: result.rows[0].uploaded_by,
-                    created_at: result.rows[0].created_at,
-                    comments: comments.rows
+                    videoId: video.id,
+                    videoTitle: video.video_title,
+                    videoAbout: video.video_about,
+                    imageUrl: video.image_url,
+                    videoUrl: video.video_url,
+                    category: video.category,
+                    uploadedBy: video.uploaded_by,
+                    created_at: video.createdAt,
+                    updated_at: video.updatedAt,
+                    comments: comments
                 }
             })
+
+        }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later1"
+         })
         })
-  
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
         })
-    }catch(err){
-        console.log(err)
-    }
+    })
 })
 
 //POST A COMMENT ON A VIDEO
 router.post('/video/:videoId/comment', async (req, res) => {
     const videoId = req.params.videoId;
     const comment = req.body.comment;
-    const commentBy = 'Chinedu Emesue' //await getUserName(req)
+    const commentBy = await getUserName(req)
 
-    try {
-        client.query("INSERT INTO video_comments(comment, comment_by, video_id, created_at)VALUES($1, $2, $3, current_timestamp)",
-                    [comment, commentBy, videoId], async (err) => {
-            if(err) { console.log(err)}
-
-            res.status(201).json({
-                status: 'success',
-                message: 'Comment added successfully',
-                data: {
-                    comment,
-                    commentBy,
-                    videoId,
-                    created_at: Date.now()
-                }
-            })
-
+    VideoComments.create({
+        comment,
+        comment_by: commentBy,
+        video_id: videoId
+    }).then( (comment) => {
+        res.status(201).json({
+            status: "success",
+            data: comment
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
+        })
+    })
 })
 
 module.exports = router;
