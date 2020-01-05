@@ -2,83 +2,107 @@ const express = require('express');
 const router = express.Router();
 const getUserName = require('../helpers/getUserName');
 
-//DATABASE CONNECTION
-const client = require('../database/dbconnect')
+//Import model
+const Lyrics = require('../models/Lyrics');
+const LyricComments = require('../models/LyricComments')
  
 
 //GET ALL LYRIC FROM THE DATABASE
 router.get('/lyric',  async (req, res) => {
-    try{
-        client.query("SELECT * FROM lyric ORDER BY id DESC", async (err, result) => {
-            if(err){ console.log(err) }
-
-            res.status(200).json({
-                status: 'success',
-                data: result.rows
-            })
-        })
-    }catch(err){
-        console.log(err)
-    }
     
+    Lyrics.findAll({
+        order: [
+            ['id', 'DESC']
+        ]
+    }).then( (item) => {
+        if(!item){
+            return res.status(200).json({
+                status: "success",
+                data: "No job posted yet"
+            })
+        }
+
+        res.status(200).json({
+            status: "success",
+            data: item
+        })
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
 })
 
 //GET A SINGLE LYRIC FROM DATABASE AND ALL ITS COMMENTS
 router.get('/lyric/:lyricId', async (req, res) => {
     const lyricId = req.params.lyricId;
-    try{
-    await  client.query("SELECT * FROM lyric WHERE id = $1", [lyricId], async (err, result) => {
-            if(err) { console.log(err) }
+    
+    Lyrics.findOne({
+        where: { id: lyricId }
+    }).then( (lyric) => {
+        if(!lyric){
+            return res.status(200).json({
+                status: "success",
+                data: "No lyric posted yet"
+            })
+        }
 
-        await client.query("SELECT * FROM lyric_comments WHERE lyric_id = $1 ORDER BY id DESC", [lyricId], async (err, comments) => {
-            if(err) { console.log(err) }
+        LyricComments.findAll({
+            where: { lyric_id: lyricId},
+            order: [
+                ['id', 'DESC']
+            ]
+        }).then( (comments) => {
+            if(!comments){
+                comments = "No comment posted yet"
+            }
 
             res.status(200).json({
-                status: 'success',
+                status: "success",
                 data: {
-                    lyricId: result.rows[0].id,
-                    lyricTitle: result.rows[0].lyric_title,
-                    lyric: result.rows[0].lyric,
-                    category: result.rows[0].category,
-                    uploadedBy: result.rows[0].uploaded_by,
-                    created_at: result.rows[0].created_at,
-                    comments: comments.rows
+                    lyricId: lyric.id,
+                    lyricTitle: lyric.lyric_title,
+                    lyric: lyric.lyric,
+                    category: lyric.category,
+                    uploadedBy: lyric.uploaded_by,
+                    created_at: lyric.createdAt,
+                    updated_at: lyric.updatedAt,
+                    comments: comments
                 }
             })
+
+        }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later1"
+         })
         })
-  
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
         })
-    }catch(err){
-        console.log(err)
-    }
+    })
 })
 
 //POST A COMMENT ON A lyric
 router.post('/lyric/:lyricId/comment', async (req, res) => {
     const lyricId = req.params.lyricId;
     const comment = req.body.comment;
-    const commentBy = 'Chinedu Emesue' //await getUserName(req)
+    const commentBy = await getUserName(req)
 
-    try {
-        client.query("INSERT INTO lyric_comments(comment, comment_by, lyric_id, created_at)VALUES($1, $2, $3, current_timestamp)",
-                    [comment, commentBy, lyricId], async (err) => {
-            if(err) { console.log(err)}
-
-            res.status(201).json({
-                status: 'success',
-                message: 'Comment added successfully',
-                data: {
-                    comment,
-                    commentBy,
-                    lyricId,
-                    created_at: Date.now()
-                }
-            })
-
+    LyricComments.create({
+        comment,
+        comment_by: commentBy,
+        lyric_id: lyricId
+    }).then( (comment) => {
+        res.status(201).json({
+            status: "success",
+            data: comment
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
+        })
+    })
 })
 
 module.exports = router;

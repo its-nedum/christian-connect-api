@@ -1,44 +1,62 @@
 const express = require('express');
 const router = express.Router();
 
-//DATABASE CONNECTION
-const client = require('../database/dbconnect')
+//Import Model
+const Jobs = require('../models/Jobs')
  
 
 //GET ALL JOB FROM THE DATABASE
 router.get('/job',  async (req, res) => {
-    try{
-        client.query("SELECT * FROM job ORDER BY id DESC", async (err, result) => {
-            if(err){ console.log(err) }
 
-            res.status(200).json({
-                status: 'success',
-                data: result.rows
+    Jobs.findAll({
+        order: [
+            ['id', 'DESC']
+        ]
+    }).then( (item) => {
+        
+        if(!item){
+            return res.status(200).json({
+                status: "success",
+                data: "No job posted yet"
             })
+        }
+
+        res.status(200).json({
+            status: "success",
+            data: item
         })
-    }catch(err){
-        console.log(err)
-    }
-    
+
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
 })
 
 
 //GET A SINGLE JOB FROM DATABASE
 router.get('/job/:jobId', async (req, res) => {
     const jobId = req.params.jobId;
-    try{
-    await  client.query("SELECT * FROM job WHERE id = $1", [jobId], async (err, result) => {
-            if(err) { console.log(err) }
-
-            res.status(200).json({
-                status: 'success',
-                data: result.rows
+    
+    Jobs.findOne({
+        where: { id: jobId }
+    }).then( (item) => {
+        if(!item){
+            return res.status(200).json({
+                status: "success",
+                data: "No job posted yet"
             })
-  
+        }
+
+        res.status(200).json({
+            status: "success",
+            data: item
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
 })
 
 
