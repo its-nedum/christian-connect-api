@@ -73,12 +73,12 @@ router.get('/lyric/:lyricId', async (req, res) => {
 
         }).catch( (error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later1"
+            error: "Something went wrong, please try again later"
          })
         })
     }).catch( (error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
 })
@@ -100,7 +100,7 @@ router.post('/lyric/:lyricId/comment', async (req, res) => {
         })
     }).catch((error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
 })

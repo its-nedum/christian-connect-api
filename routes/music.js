@@ -28,7 +28,7 @@ router.get('/music',  async (req, res) => {
         })
     }).catch((error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
     
@@ -76,12 +76,12 @@ router.get('/music/:musicId', async (req, res) => {
 
         }).catch( (error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later1"
+            error: "Something went wrong, please try again later"
          })
         })
     }).catch( (error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
 })
@@ -103,7 +103,7 @@ router.post('/music/:musicId/comment', async (req, res) => {
         })
     }).catch((error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
 

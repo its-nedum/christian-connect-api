@@ -3,8 +3,12 @@ const router = express.Router();
 const fileUpload = require('express-fileupload')
 const getAdminName = require('../helpers/getAdminName')
 
-//DATABASE CONNECTION
-const client = require('../database/dbconnect')
+//Model CONNECTION
+const Musics = require('../models/Musics')
+const Videos = require('../models/Videos')
+const Lyrics = require('../models/Lyrics')
+const Events = require('../models/Events')
+const Jobs = require('../models/Jobs')
 
 //SETUP CLOUDINARY
 const cloudinary = require('cloudinary').v2
@@ -28,55 +32,63 @@ router.post('/music',  async (req, res) => {
     const uploadedBy = await getAdminName(req);
     const image = req.files.image
     const music = req.files.music
-    try{
+
+    //Validation check
+    if(!musicTitle || !musicAbout || !image || !music){
+        return res.status(400).json({
+            message: "All fields are required"
+        })
+    }
+
     //Check if song already exist
-    await client.query("SELECT * FROM music WHERE music_title = $1", [musicTitle], async (err, result) => {
-        if(err) { console.log(err) }
+    Musics.findOne({
+        where: { music_title: musicTitle }
+    }).then( (item) => {
         //If song already exist do this
-        if(result.rows[0]){
+        if(item){
             return res.status(400).json({
                 message: 'Song already exist'
             })
-        } else {
+        }else{
             //If song does not exist in database then we add it
             let urls = [];
 
             //Save the media files in an array
             let media = [image.tempFilePath, music.tempFilePath];
             for(let singleTemp of media){
-              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/music'}, async (err, result) => {
+               cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/music'}, async (err, result) => {
                     if(err){
                         console.log(err)
                     }
                    await urls.push(result.secure_url)
-                })
-              
+                }) 
             }
             //Save data to Database
-            await client.query("INSERT INTO music(music_title, music_about, image_url, music_url, category, uploaded_by, created_at)VALUES($1, $2, $3, $4, $5, $6, current_timestamp)",
-                            [musicTitle, musicAbout, urls[0], urls[1], category, uploadedBy], (err) => {
-                             if(err){console.log(err)}  
-                            
-                             res.status(201).json({
-                                status: 'success',
-                                message: 'Song added successfully',
-                                data: {
-                                    musicTitle,
-                                    musicAbout,
-                                    imageUrl: urls[0],
-                                    musicUrl: urls[1],
-                                    category,
-                                    uploadedBy,
-                                    created_at: Date.now()
-                                }
-                            })
-        
-                            })
+            Musics.create({
+                music_title: musicTitle,
+                music_about: musicAbout,
+                image_url: urls[0],
+                music_url: urls[1],
+                category,
+                uploaded_by: uploadedBy
+            }).then( (song) => {
+                res.status(201).json({
+                    status: "success",
+                    message: 'Song added successfully',
+                    data: song
+                })
+            }).catch((error) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later"
+                })
+            })
         }
+
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
     })
-    }catch(err){
-        console.log(err)
-    }
 })
 
 //POST A VIDEO TO DATABASE
@@ -87,55 +99,61 @@ router.post('/video', async (req, res) => {
     const video = req.files.video;
     const category = 'Video';
     const uploadedBy = await getAdminName(req);
-    try{
+    //Validation check
+    if(!videoTitle || !videoAbout || !image || !video){
+        return res.status(400).json({
+            message: "All fields are required"
+        })
+    }
     //Check if video already exist
-    await client.query("SELECT * FROM video WHERE video_title = $1", [videoTitle], async (err, result) => {
-        if(err) { console.log(err) }
+    Videos.findOne({
+        where: { video_title: videoTitle }
+    }).then( (item) => {
         //If video already exist do this
-        if(result.rows[0]){
+        if(item){
             return res.status(400).json({
                 message: 'Video already exist'
             })
-        } else {
+        }else{
             //If video does not exist in database then we add it
             let urls = [];
 
             //Save the media files in an array
             let media = [image.tempFilePath, video.tempFilePath];
             for(let singleTemp of media){
-              await  cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, async (err, result) => {
+               cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, async (err, result) => {
                     if(err){
                         console.log(err)
                     }
                    await urls.push(result.secure_url)
-                })
-              
+                }) 
             }
             //Save data to Database
-            await client.query("INSERT INTO video(video_title, video_about, image_url, video_url, category, uploaded_by, created_at)VALUES($1, $2, $3, $4, $5, $6, current_timestamp)",
-                            [videoTitle, videoAbout, urls[0], urls[1], category, uploadedBy], (err) => {
-                             if(err){console.log(err)}  
-                            
-                             res.status(201).json({
-                                status: 'success',
-                                message: 'Video added successfully',
-                                data: {
-                                    videoTitle,
-                                    videoAbout,
-                                    imageUrl: urls[0],
-                                    videoUrl: urls[1],
-                                    category,
-                                    uploadedBy,
-                                    created_at: Date.now()
-                                }
-                            })
-        
-                            })
+            Videos.create({
+                video_title: videoTitle,
+                video_about: videoAbout,
+                image_url: urls[0],
+                video_url: urls[1],
+                category,
+                uploaded_by: uploadedBy
+            }).then( (video) => {
+                res.status(201).json({
+                    status: "success",
+                    message: 'Video added successfully',
+                    data: video
+                })
+            }).catch((error) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later"
+                })
+            })
         }
+
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
     })
-    }catch(err){
-        console.log(err)
-    }
 
 })
 
@@ -146,38 +164,45 @@ router.post('/lyric', async (req, res) => {
     const  lyric = req.body.lyric;
     const category = 'Lyric';
     const uploadedBy = await getAdminName(req);
-    try{
-    await client.query("SELECT * FROM lyric WHERE lyric_title = $1", [lyricTitle], async (err, result) => {
-        if(err) { console.log(err)}
-
-        //If lyric exist do this
-        if(result.rows[0]){
-            return res.status(400).json({
-                message: 'Lyric already exist'
-            })
-        } else{
-            //If lyric does not exist then we save it
-            await client.query("INSERT INTO lyric(lyric_title, lyric, category, uploaded_by, created_at)VALUES($1,$2,$3,$4, current_timestamp)",
-                        [lyricTitle, lyric, category, uploadedBy], (err) => {
-                            if(err) {console.log(err)}
-
-                            res.status(201).json({
-                                status: 'success',
-                                message: 'Lyric added successfully',
-                                data: {
-                                    lyricTitle,
-                                    lyric,
-                                    category,
-                                    uploadedBy,
-                                    created_at: Date.now()
-                                }
-                            })
-                        })
-        }
-    })
-    }catch(err){
-        console.log(err)
+    //Validation check
+    if(!lyricTitle || !lyric){
+        return res.status(400).json({
+            message: "All fields are required"
+        })
     }
+    //Check if lyric exist
+    Lyrics.findOne({
+        where: { lyric_title: lyricTitle }
+    }).then( (item) => {
+        //If lyric exists do this
+        if(item){
+            return res.status(400).json({
+                message: 'Lyrics already exist'
+            })
+        }else{
+            //if lyrics does not exist add it
+            Lyrics.create({
+                lyric_title: lyricTitle,
+                lyric,
+                category,
+                uploaded_by: uploadedBy
+            }).then( (newLyric) => {
+                    res.status(201).json({
+                        status: "success",
+                        message: "Lyric added successfully",
+                        data: newLyric
+                    })
+            }).catch((error) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later"
+                })
+            })
+        }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
 })
 
 //POST EVENT TO THE DATABASE
@@ -194,51 +219,64 @@ router.post('/event', async (req, res) => {
     const image = req.files.image;
     const category = 'Event';
     const uploadedBy = await getAdminName(req)
-    try{
-        //check if event already exist
-        await client.query("SELECT * FROM event WHERE theme = $1", [theme], async (err, result) => {
-            if(err) {console.log(err)}
-            //If event exist do this
-            if(result.rows[0]){
-                return res.status(400).json({
-                    message: 'Event already exist'
-                })
-
-            } else { 
-                //Save event image to cloudinary
+    
+    //Validation check
+    if(!theme || !organizer || !ministering || !venue || !startDate || !endDate
+        || !time || !enquiry || !comment || !image){
+            return res.status(400).json({
+                message: "All fields are required"
+            })
+        }
+    //Check if events already exist
+    Events.findOne({
+        where: {theme}
+    }).then( (item) => {
+        if(item){
+            return res.status(400).json({
+                message: 'Event already exist'
+            })
+        }else{
+            //If event does not exist add it
+            //Save event image to cloudinary
                 // if(image.mimetype !== 'image/jpg' || image.mimetype !== 'image/png') {
                 //     return res.status(415).json({
                 //         message: 'Please upload a image file',  
                 //         })
                 //   }
-
-                await cloudinary.uploader.upload(image.tempFilePath, {folder: 'Christian Connect/event'}, async (err, result) => {
-                    if(err){console.log(err)}
-                        let image_url = result.secure_url;
-
-                    await client.query("INSERT INTO event(theme,organizer,ministering,venue,start_date,end_date,time,enquiry,comment,image_url,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, current_timestamp)", 
-                        [theme,organizer,ministering,venue,startDate,endDate,time,enquiry,comment,image_url,category, uploadedBy], 
-                        (err) => {
-                            if(err) {console.log(err)}
-
-                            res.status(201).json({
-                                status: 'success',
-                                message: 'Event added successfully',
-                                data: {
-                                    theme,
-                                    organizer,
-                                    venue,
-                                    image_url
-                                }
-                            })
+            cloudinary.uploader.upload(image.tempFilePath, {folder: 'Christian Connect/event'}, async (err, result) => {
+                if(err){console.log(err)}
+                    let image_url = result.secure_url;
+                Events.create({
+                    theme,
+                    organizer,
+                    ministering,
+                    venue,
+                    start_date: startDate,
+                    end_date: endDate,
+                    time,
+                    enquiry,
+                    comment,
+                    image_url,
+                    category,
+                    uploaded_by: uploadedBy
+                }).then( (newEvent) => {
+                    res.status(201).json({
+                        status: "success",
+                        message: "Event added successfully",
+                        data: newEvent
+                    })
+                }).catch((error) => {
+                    res.status(500).json({
+                        error: "Something went wrong, please try again later"
                     })
                 })
-
-            }
+            })
+        }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
         })
-    }catch(err){
-        console.log(err)
-    }
+    })
 })
 
 //POST JOB TO THE DATABASE
@@ -255,27 +293,39 @@ router.post('/job', async (req, res) => {
     const apply = req.body.apply;
     const category = 'job'
     const uploadedBy = await getAdminName(req)
-    try{
-    await client.query("INSERT INTO job(position,company,location,salary,job_type,deadline,summary,description,requirement,apply,category,uploaded_by,created_at)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,current_timestamp)",
-                 [position,company,location,salary,jobType,deadline,summary,description,requirement,apply,category,uploadedBy], (err) => {
-                     if(err) { console.log(err) }
+    //Validation check
+    if(!position || !company || !location || 
+        !salary || !jobType || !deadline || 
+        !summary || !description || !requirement || !apply){
+            return res.status(400).json({
+                message: "All fields are required"
+            })
+        }
 
-                     res.status(201).json({
-                         status: 'success',
-                         message: 'Job added successfully',
-                         data: {
-                             position,
-                             company,
-                             salary,
-                             deadline,
-                             category
-                         }
-                     })
-                 })
-
-    }catch(err){
-        console.log(err)
-    }
+    Jobs.create({
+            position,
+            company,
+            location,
+            salary,
+            job_type: jobType,
+            deadline,
+            summary,
+            description,
+            requirement,
+            apply,
+            category,
+            uploaded_by: uploadedBy
+    }).then( (job) => {
+        res.status(201).json({
+            status: "success",
+            message: "Job added successfully",
+            data: job
+        })
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
 
 })
 

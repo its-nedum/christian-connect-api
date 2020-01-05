@@ -27,7 +27,7 @@ router.get('/video',  async (req, res) => {
         })
     }).catch((error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
     
@@ -75,12 +75,12 @@ router.get('/video/:videoId', async (req, res) => {
 
         }).catch( (error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later1"
+            error: "Something went wrong, please try again later"
          })
         })
     }).catch( (error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
 })
@@ -102,7 +102,7 @@ router.post('/video/:videoId/comment', async (req, res) => {
         })
     }).catch((error) => {
         res.status(500).json({
-            error: "Something went wrong, please try again later2"
+            error: "Something went wrong, please try again later"
         })
     })
 })
