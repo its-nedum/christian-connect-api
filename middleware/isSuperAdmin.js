@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const client = require('../database/dbconnect')
 
+//Import Model
+const Admins = require('../models/Admins')
+
 const isSuperAdmin = (req, res, next) => {
     //Get auth header value
     const bearerHeader = req.headers['authorization'];
@@ -15,25 +18,25 @@ const isSuperAdmin = (req, res, next) => {
        jwt.verify(req.token, process.env.SECRET_TOKEN, (err, decode) => {
            if(err){console.log(err)}
            
-           client.query("SELECT admin_type from admins WHERE email = $1",[decode.email],(err, result) => {
-            if(err){
-                console.log(err)
-            }
-            
-            if(!result.rows[0]){
-                res.status(400).json({
-                    message: 'Invalid user token'
+            Admins.findOne({
+                where: { email: decode.email}
+            }).then( (user) => {
+                if(!user){
+                   return res.status(400).json({
+                        message: 'Invalid user token'
+                    }) 
+                }
+                if(user.admin_type !== 'super admin'){
+                    return res.status(400).json({
+                        message: 'Sorry, You Are Not Authorized For This Action'
+                    })
+                }
+                next();
+            }).catch( (error) => {
+                res.status(500).json({
+                    message: "Something went wrong, please try again later"
                 })
-                return;
-            }
-            if(result.rows[0].admin_type !== 'Super Admin'){
-                res.status(400).json({
-                    message: 'Sorry, You Are Not Authorized For This Action'
-                })
-                return;
-            }
-           next();
-        })
+            })
        });
        
     }else {

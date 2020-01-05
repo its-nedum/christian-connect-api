@@ -6,18 +6,26 @@ const jwt = require('jsonwebtoken');
 //IMPORT MODEL
 const Admins = require('../models/Admins')
 
+//Authenticate super admin
+const isSuperAdmin = require('../middleware/isSuperAdmin');
+
+
 //CREATE ADMIN ACCOUNT
-router.post('/create-admin', async (req, res) => {
+router.post('/create-admin', isSuperAdmin, async (req, res) => {
     //collect form data
     let {firstname, lastname, email, username, password, admin_type} = req.body;
-    email = email.toLowerCase();
-    username = username.toLowerCase()
+    
     //Input validation
-    if(!email || !username){
+    if(!firstname || !lastname || !email || !username || !password || !admin_type){
         return res.status(200).json({
             message: "Please enter all fields"
         })
     }
+
+    email = email.toLowerCase();
+    username = username.toLowerCase();
+    admin_type = admin_type.toLowerCase();
+
         //Check if the admin email already exist
         Admins.findOne({
             where: { email }
@@ -80,14 +88,15 @@ router.post('/create-admin', async (req, res) => {
 //SIGN IN AN ADMIN
 router.post('/signin-admin', async (req, res) => {
    let {email, password} = req.body
-   email = email.toLowerCase();
+   
     //If email and password is empty
    if(!email || !password){
     return res.status(400).json({
          message: 'All fields are required'
      })
     }
-
+    
+    email = email.toLowerCase();
     //Verify admin email
     const emailChecked = /\S+@\S+\.\S+/.test(email);
     if(!emailChecked){
