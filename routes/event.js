@@ -1,24 +1,27 @@
 const express = require('express');
 const router = express.Router();
 
-//DATABASE CONNECTION
-const client = require('../database/dbconnect')
+//IMPORT MODEL
+const Events = require('../models/Events')
  
 
 //GET ALL EVENT FROM THE DATABASE
 router.get('/event',  async (req, res) => {
-    try{
-        client.query("SELECT * FROM event ORDER BY id DESC", async (err, result) => {
-            if(err){ console.log(err) }
-
-            res.status(200).json({
-                status: 'success',
-                data: result.rows
-            })
+    //NOTE: add ORDER BY DESC
+    Events.findAll(
+        { order:[ 
+            ['id', 'DESC'] 
+        ]}
+    ).then( (item) => {
+        res.status(200).json({
+            status: "success",
+            data: item
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
     
 })
 

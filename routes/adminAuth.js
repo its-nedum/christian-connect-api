@@ -3,8 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-//IMPORT DATABASE AND MODEL
-const db = require('../database/sequelizeConnect')
+//IMPORT MODEL
 const Admins = require('../models/Admins')
 
 //CREATE ADMIN ACCOUNT
