@@ -2,85 +2,108 @@ const express = require('express');
 const router = express.Router();
 const getUserName = require('../helpers/getUserName');
 
-//DATABASE CONNECTION
-const client = require('../database/dbconnect')
+//Import Model
+const Musics = require('../models/Musics')
+const MusicComments = require('../models/MusicComments')
  
 
 //GET ALL SONG FROM THE DATABASE
 router.get('/music',  async (req, res) => {
-    try{
-        client.query("SELECT * FROM music ORDER BY id DESC", async (err, result) => {
-            if(err){ console.log(err) }
+    
+    Musics.findAll({
+        order: [
+            ['id', 'DESC']
+        ]
+    }).then( (music) => {
+        if(!music){
+            let music = "No music posted yet"
+        }
 
-            res.status(200).json({
-                status: 'success',
-                data: result.rows
-            })
+        res.status(200).json({
+            status: "success",
+            data: music
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
+        })
+    })
     
 })
 
 //GET A SINGLE SONG FROM DATABASE AND ALL ITS COMMENTS
 router.get('/music/:musicId', async (req, res) => {
     const musicId = req.params.musicId;
-    try{
-    await  client.query("SELECT * FROM music WHERE id = $1", [musicId], async (err, result) => {
-            if(err) { console.log(err) }
+    
+    Musics.findOne({
+        where: { id: musicId }
+    }).then( (music) => {
+        if(!music){
+            return res.status(200).json({
+                status: "success",
+                data: "No music posted yet"
+            })
+        }
 
-        await client.query("SELECT * FROM music_comments WHERE music_id = $1 ORDER BY id DESC", [musicId], async (err, comments) => {
-            if(err) { console.log(err) }
+        MusicComments.findAll({
+            where: { music_id: musicId},
+            order: [
+                ['id', 'DESC']
+            ]
+        }).then( (comments) => {
+            if(!comments){
+                comments = "No comment posted yet"
+            }
 
             res.status(200).json({
-                status: 'success',
+                status: "success",
                 data: {
-                    musicId: result.rows[0].id,
-                    musicTitle: result.rows[0].music_title,
-                    musicAbout: result.rows[0].music_about,
-                    imageUrl: result.rows[0].image_url,
-                    musicUrl: result.rows[0].music_url,
-                    category: result.rows[0].category,
-                    uploadedBy: result.rows[0].uploaded_by,
-                    created_at: result.rows[0].created_at,
-                    comments: comments.rows
+                    musicId: music.id,
+                    musicTitle: music.music_title,
+                    musicAbout: music.music_about,
+                    imageUrl: music.image_url,
+                    musicUrl: music.music_url,
+                    category: music.category,
+                    uploadedBy: music.uploaded_by,
+                    created_at: music.createdAt,
+                    updated_at: music.updatedAt,
+                    comments: comments
                 }
             })
+
+        }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later1"
+         })
         })
-  
+    }).catch( (error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
         })
-    }catch(err){
-        console.log(err)
-    }
+    })
 })
 
 //POST A COMMENT ON A SONG
 router.post('/music/:musicId/comment', async (req, res) => {
     const musicId = req.params.musicId;
     const comment = req.body.comment;
-    const commentBy = 'Chinedu Emesue' //await getUserName(req)
+    const commentBy = await getUserName(req)
 
-    try {
-        client.query("INSERT INTO music_comments(comment, comment_by, music_id, created_at)VALUES($1, $2, $3, current_timestamp)",
-                    [comment, commentBy, musicId], async (err) => {
-            if(err) { console.log(err)}
-
-            res.status(201).json({
-                status: 'success',
-                message: 'Comment added successfully',
-                data: {
-                    comment,
-                    commentBy,
-                    musicId,
-                    created_at: Date.now()
-                }
-            })
-
+    MusicComments.create({
+        comment,
+        comment_by: commentBy,
+        music_id: musicId
+    }).then( (comment) => {
+        res.status(201).json({
+            status: "success",
+            data: comment
         })
-    }catch(err){
-        console.log(err)
-    }
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later2"
+        })
+    })
+
 })
 
 module.exports = router;
