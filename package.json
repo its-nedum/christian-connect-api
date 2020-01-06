@@ -7,6 +7,10 @@
     "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": "12.13.0",
+    "npm": "6.12.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/its-nedum/christian-connect-api.git"
