@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const cors = require('cors')
 const app = express();
+const swaggerUi = require('swagger-ui-express')
+const swaggerDocument = require('./swagger.json')
 
 
 //CORS - This allows access from different origin to my API
@@ -21,6 +23,9 @@ app.use((req, res, next) => {
 //Setup body-parser middleware
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
+
+//API Documentation ROUTE
+app.use('api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // ADMINS ROUTE
 const adminRouter = require('./routes/admins')
