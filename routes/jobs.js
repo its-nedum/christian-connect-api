@@ -6,7 +6,7 @@ const Jobs = require('../models/Jobs')
  
 
 //GET ALL JOB FROM THE DATABASE
-router.get('/job',  async (req, res) => {
+router.get('/category/job',  async (req, res) => {
 
     Jobs.findAll({
         order: [

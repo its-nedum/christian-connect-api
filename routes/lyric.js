@@ -8,7 +8,7 @@ const LyricComments = require('../models/LyricComments')
  
 
 //GET ALL LYRIC FROM THE DATABASE
-router.get('/lyric',  async (req, res) => {
+router.get('/category/lyric',  async (req, res) => {
     
     Lyrics.findAll({
         order: [

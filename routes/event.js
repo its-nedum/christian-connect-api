@@ -6,7 +6,7 @@ const Events = require('../models/Events')
  
 
 //GET ALL EVENT FROM THE DATABASE
-router.get('/event',  async (req, res) => {
+router.get('/category/event',  async (req, res) => {
     //NOTE: add ORDER BY DESC
     Events.findAll(
         { order:[ 

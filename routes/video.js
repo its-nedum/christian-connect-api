@@ -8,7 +8,7 @@ const VideoComments = require('../models/VideoComments')
  
 
 //GET ALL VIDEO FROM THE DATABASE
-router.get('/video',  async (req, res) => {
+router.get('/category/video',  async (req, res) => {
     Videos.findAll({
         order: [
             ['id', 'DESC']

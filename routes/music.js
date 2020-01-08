@@ -8,7 +8,7 @@ const MusicComments = require('../models/MusicComments')
  
 
 //GET ALL SONG FROM THE DATABASE
-router.get('/music',  async (req, res) => {
+router.get('/category/music',  async (req, res) => {
     
     Musics.findAll({
         order: [
