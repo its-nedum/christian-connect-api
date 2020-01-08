@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 //API Documentation ROUTE
-app.use('api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // ADMINS ROUTE
 const adminRouter = require('./routes/admins')
