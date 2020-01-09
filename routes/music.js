@@ -35,7 +35,7 @@ router.get('/category/music',  async (req, res) => {
 })
 
 //GET A SINGLE SONG FROM DATABASE AND ALL ITS COMMENTS
-router.get('/music/:musicId', async (req, res) => {
+router.get('/category/music/:musicId', async (req, res) => {
     const musicId = req.params.musicId;
     
     Musics.findOne({
@@ -87,7 +87,7 @@ router.get('/music/:musicId', async (req, res) => {
 })
 
 //POST A COMMENT ON A SONG
-router.post('/music/:musicId/comment', async (req, res) => {
+router.post('/category/music/:musicId/comment', async (req, res) => {
     const musicId = req.params.musicId;
     const comment = req.body.comment;
     const commentBy = await getUserName(req)
