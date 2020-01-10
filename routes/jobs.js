@@ -35,7 +35,7 @@ router.get('/category/job',  async (req, res) => {
 
 
 //GET A SINGLE JOB FROM DATABASE
-router.get('/job/:jobId', async (req, res) => {
+router.get('/category/job/:jobId', async (req, res) => {
     const jobId = req.params.jobId;
     
     Jobs.findOne({

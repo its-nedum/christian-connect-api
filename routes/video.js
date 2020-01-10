@@ -34,7 +34,7 @@ router.get('/category/video',  async (req, res) => {
 })
 
 //GET A SINGLE VIDEO FROM DATABASE AND ALL ITS COMMENTS
-router.get('/video/:videoId', async (req, res) => {
+router.get('/category/video/:videoId', async (req, res) => {
     const videoId = req.params.videoId;
 
     Videos.findOne({
@@ -86,7 +86,7 @@ router.get('/video/:videoId', async (req, res) => {
 })
 
 //POST A COMMENT ON A VIDEO
-router.post('/video/:videoId/comment', async (req, res) => {
+router.post('/category/video/:videoId/comment', async (req, res) => {
     const videoId = req.params.videoId;
     const comment = req.body.comment;
     const commentBy = await getUserName(req)

@@ -34,7 +34,7 @@ router.get('/category/lyric',  async (req, res) => {
 })
 
 //GET A SINGLE LYRIC FROM DATABASE AND ALL ITS COMMENTS
-router.get('/lyric/:lyricId', async (req, res) => {
+router.get('/category/lyric/:lyricId', async (req, res) => {
     const lyricId = req.params.lyricId;
     
     Lyrics.findOne({
@@ -84,7 +84,7 @@ router.get('/lyric/:lyricId', async (req, res) => {
 })
 
 //POST A COMMENT ON A lyric
-router.post('/lyric/:lyricId/comment', async (req, res) => {
+router.post('/category/lyric/:lyricId/comment', async (req, res) => {
     const lyricId = req.params.lyricId;
     const comment = req.body.comment;
     const commentBy = await getUserName(req)

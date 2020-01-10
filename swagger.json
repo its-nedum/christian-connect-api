@@ -76,7 +76,7 @@
         }
       }
     },
-    "/music/{id}": {
+    "/category/music/{id}": {
       "get": {
         "tags": [
           "Music"
@@ -112,7 +112,7 @@
         }
       }
     },
-    "/music/:id/comment": {
+    "/category/music/:id/comment": {
       "post": {
         "tags": [
           "Music"
@@ -177,7 +177,7 @@
         }
       }
     },
-    "/video/{id}": {
+    "/category/video/{id}": {
       "get": {
         "tags": [
           "Video"
@@ -213,7 +213,7 @@
         }
       }
     },
-    "/video/:id/comment": {
+    "/category/video/:id/comment": {
       "post": {
         "tags": [
           "Video"
@@ -278,7 +278,7 @@
         }
       }
     },
-    "/lyric/{id}": {
+    "/category/lyric/{id}": {
       "get": {
         "tags": [
           "Lyric"
@@ -314,7 +314,7 @@
         }
       }
     },
-    "/lyric/:id/comment": {
+    "/category/lyric/:id/comment": {
       "post": {
         "tags": [
           "Lyric"
@@ -406,7 +406,7 @@
         }
       }
     },
-    "/job/{id}": {
+    "/category/job/{id}": {
       "get": {
         "tags": [
           "Job"
