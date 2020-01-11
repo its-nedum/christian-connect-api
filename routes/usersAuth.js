@@ -36,7 +36,7 @@ router.post('/signup', async (req, res) => {
     //Input validation
     if(!email || !username){
         return res.status(200).json({
-            message: "Please enter all fields"
+            message: "Please all fields are required"
         })
     }
     //Check if email already exist
@@ -54,7 +54,7 @@ router.post('/signup', async (req, res) => {
             }).then( (nickname) => {
                 if(nickname){ 
                     return res.status(200).json({
-                        message: "Username is taken"
+                        message: "Username is already taken"
                     })
                 }else{ 
                     //Hash the user password
@@ -76,7 +76,7 @@ router.post('/signup', async (req, res) => {
                                 let userId = user.id;
                                 const token = jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'})
                                 res.status(201).json({
-                                    status: 'User created successfully',
+                                    message: 'Account created successfully',
                                     data: user,
                                     token
                                 })
@@ -109,7 +109,7 @@ router.post('/signin', async (req, res) => {
     email = email.toLowerCase();
     //Perform validation
     if(!email || !password){
-       return res.status(400).json({
+       return res.status(200).json({
             message: 'All fields are required'
         })
     }
@@ -117,7 +117,7 @@ router.post('/signin', async (req, res) => {
     //Verify user email
     const emailChecked = /\S+@\S+\.\S+/.test(email);
     if(!emailChecked){
-        return res.status(400).json({message: 'Please enter a valid email'})
+        return res.status(200).json({message: 'Please enter a valid email'})
     }
 
     //Check if user account exists
@@ -125,7 +125,7 @@ router.post('/signin', async (req, res) => {
         where: { email }
     }).then( (user) => {
         if(user == null){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'The credentials you provided does not exist'
             })
         }else{
@@ -134,7 +134,7 @@ router.post('/signin', async (req, res) => {
             bcrypt.compare(password, dbpassword).then(
                 (valid) => {
                     if(valid == false){
-                        return res.status(400).json({message: 'The credentials you provided is incorrect'}) 
+                        return res.status(200).json({message: 'The credentials you provided is incorrect'}) 
                     }
                     //Prepare JWT payload
                     const name = user.firstname + ' ' + user.lastname;
@@ -144,7 +144,7 @@ router.post('/signin', async (req, res) => {
                         if(err) { console.log(err) }
 
                         res.status(200).json({
-                            status: 'success',
+                            message: 'Login was successful',
                             data: {
                                 userId: user.id,
                                 username: user.username,
@@ -195,7 +195,7 @@ router.post('/update-profile', authenticate, async (req, res) => {
         { where: { id } }
     ).then( (user) => {
         res.status(201).json({
-            status: 'Profile updated successfully',
+            message: 'Profile updated successfully',
             data: user
         })
     }).catch( (err) => {
@@ -222,7 +222,7 @@ router.post('/avatar', authenticate, async (req, res) => {
                 {where: {userId}}
                 ).then( (user) => {
                     res.status(201).json({
-                        status: "Profile picture updated successfully"
+                        message: "Profile picture updated successfully"
                     })
                 }).catch( (err) => {
                     res.status(500).json({
@@ -260,7 +260,7 @@ router.post('/change-password', authenticate, async (req, res) => {
                             {where: {id: userId}}
                             ).then( () => {
                                 res.status(201).json({
-                                    status: "Password updated successfully"
+                                    message: "Password updated successfully"
                                 })
                             }).catch( err => {
                                 res.status(500).json({

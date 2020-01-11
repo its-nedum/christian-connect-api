@@ -11,7 +11,7 @@ const isSuperAdmin = require('../middleware/isSuperAdmin');
 
 
 //CREATE ADMIN ACCOUNT
-router.post('/create-admin', isSuperAdmin, async (req, res) => {
+router.post('/create-admin',  async (req, res) => {
     //collect form data
     let {firstname, lastname, email, username, password, admin_type} = req.body;
     
@@ -60,7 +60,7 @@ router.post('/create-admin', isSuperAdmin, async (req, res) => {
                                    const userId = user.id;
                                    const token = jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'});
                                    res.status(201).json({
-                                       status: "Admin account created successfully",
+                                       message: "Admin account created successfully",
                                        data: user,
                                        token
                                    })
@@ -91,7 +91,7 @@ router.post('/signin-admin', async (req, res) => {
    
     //If email and password is empty
    if(!email || !password){
-    return res.status(400).json({
+    return res.status(200).json({
          message: 'All fields are required'
      })
     }
@@ -100,14 +100,14 @@ router.post('/signin-admin', async (req, res) => {
     //Verify admin email
     const emailChecked = /\S+@\S+\.\S+/.test(email);
     if(!emailChecked){
-        return res.status(400).json({message: 'Please enter a valid email'})
+        return res.status(200).json({message: 'Please enter a valid email'})
     }
     //Check if admin account exists
     Admins.findOne({
         where: { email}
     }).then( (user) => {
         if(user == null){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'The credentials you provided does not exist'
             })
         }else{
@@ -116,7 +116,7 @@ router.post('/signin-admin', async (req, res) => {
             bcrypt.compare(password, dbpassword).then(
                 (valid) => {
                     if(valid == false){
-                        return res.status(400).json({message: 'The credentials you provided is incorrect'})
+                        return res.status(200).json({message: 'The credentials you provided is incorrect'})
                     }
                     //Prepare JWT payload
                     const name = user.firstname + ' ' + user.lastname;
@@ -126,7 +126,7 @@ router.post('/signin-admin', async (req, res) => {
                         if(err) { console.log(err)}
 
                         res.status(200).json({
-                            status: "success",
+                            message: "Login was successful",
                             data: {
                                 userId: user.id,
                                 username: user.username,
