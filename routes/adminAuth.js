@@ -11,7 +11,7 @@ const isSuperAdmin = require('../middleware/isSuperAdmin');
 
 
 //CREATE ADMIN ACCOUNT
-router.post('/create-admin',  async (req, res) => {
+router.post('/create-admin', isSuperAdmin, async (req, res) => {
     //collect form data
     let {firstname, lastname, email, username, password, admin_type} = req.body;
     
