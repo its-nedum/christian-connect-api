@@ -35,7 +35,7 @@ router.post('/music',  async (req, res) => {
 
     //Validation check
     if(!musicTitle || !musicAbout || !image || !music){
-        return res.status(400).json({
+        return res.status(200).json({
             message: "All fields are required"
         })
     }
@@ -46,7 +46,7 @@ router.post('/music',  async (req, res) => {
     }).then( (item) => {
         //If song already exist do this
         if(item){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'Song already exist'
             })
         }else{
@@ -101,7 +101,7 @@ router.post('/video', async (req, res) => {
     const uploadedBy = await getAdminName(req);
     //Validation check
     if(!videoTitle || !videoAbout || !image || !video){
-        return res.status(400).json({
+        return res.status(200).json({
             message: "All fields are required"
         })
     }
@@ -111,7 +111,7 @@ router.post('/video', async (req, res) => {
     }).then( (item) => {
         //If video already exist do this
         if(item){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'Video already exist'
             })
         }else{
@@ -166,7 +166,7 @@ router.post('/lyric', async (req, res) => {
     const uploadedBy = await getAdminName(req);
     //Validation check
     if(!lyricTitle || !lyric){
-        return res.status(400).json({
+        return res.status(200).json({
             message: "All fields are required"
         })
     }
@@ -176,7 +176,7 @@ router.post('/lyric', async (req, res) => {
     }).then( (item) => {
         //If lyric exists do this
         if(item){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'Lyrics already exist'
             })
         }else{
@@ -223,7 +223,7 @@ router.post('/event', async (req, res) => {
     //Validation check
     if(!theme || !organizer || !ministering || !venue || !startDate || !endDate
         || !time || !enquiry || !comment || !image){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "All fields are required"
             })
         }
@@ -232,7 +232,7 @@ router.post('/event', async (req, res) => {
         where: {theme}
     }).then( (item) => {
         if(item){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: 'Event already exist'
             })
         }else{
@@ -297,7 +297,7 @@ router.post('/job', async (req, res) => {
     if(!position || !company || !location || 
         !salary || !jobType || !deadline || 
         !summary || !description || !requirement || !apply){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "All fields are required"
             })
         }

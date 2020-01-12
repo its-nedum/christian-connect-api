@@ -70,8 +70,4 @@ app.get('/api/v1/', (req, res) => {
   })
 })
 
-
-
-
-
 module.exports = app;
