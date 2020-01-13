@@ -239,8 +239,8 @@ router.post('/event', async (req, res) => {
             //If event does not exist add it
             //Save event image to cloudinary
                 // if(image.mimetype !== 'image/jpg' || image.mimetype !== 'image/png') {
-                //     return res.status(415).json({
-                //         message: 'Please upload a image file',  
+                //     return res.status(200).json({
+                //         message: 'Please upload an image file',  
                 //         })
                 //   }
             cloudinary.uploader.upload(image.tempFilePath, {folder: 'Christian Connect/event'}, async (err, result) => {
@@ -291,11 +291,10 @@ router.post('/job', async (req, res) => {
     const description = req.body.description;
     const requirement = req.body.requirement;
     const apply = req.body.apply;
-    const category = 'job'
+    const category = 'Job'
     const uploadedBy = await getAdminName(req)
     //Validation check
-    if(!position || !company || !location || 
-        !salary || !jobType || !deadline || 
+    if(!position || !company || !location || !salary || !jobType || !deadline || 
         !summary || !description || !requirement || !apply){
             return res.status(200).json({
                 message: "All fields are required"

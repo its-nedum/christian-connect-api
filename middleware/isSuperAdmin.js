@@ -22,12 +22,12 @@ const isSuperAdmin = (req, res, next) => {
                 where: { email: decode.email}
             }).then( (user) => {
                 if(!user){
-                   return res.status(400).json({
+                   return res.status(200).json({
                         message: 'Invalid user token'
                     }) 
                 }
                 if(user.admin_type !== 'super admin'){
-                    return res.status(400).json({
+                    return res.status(200).json({
                         message: 'Sorry, You Are Not Authorized For This Action'
                     })
                 }
