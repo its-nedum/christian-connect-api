@@ -63,6 +63,10 @@ app.use('/api/v1', adminDashboard)
 const adminAuthRouter = require('./routes/adminAuth')
 app.use('/api/v1', adminAuthRouter)
 
+//Send Friend Request Route
+const requestsRouter = require('./routes/requests')
+app.use('/api/v1', requestsRouter)
+
 //Home route
 app.get('/api/v1/', (req, res) => {
   res.json({
