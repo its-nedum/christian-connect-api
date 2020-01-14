@@ -121,10 +121,10 @@ router.post('/video', async (req, res) => {
             //Save the media files in an array
             let media = [image.tempFilePath, video.tempFilePath];
             for(let singleTemp of media){
-               cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, async (err, result) => {
+            cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, async (err, result) => {
                     if(err){
                         console.log(err)
-                    }
+                    } console.log(result)
                    await urls.push(result.secure_url)
                 }) 
             }

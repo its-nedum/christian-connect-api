@@ -25,5 +25,23 @@ router.get('/category/event',  async (req, res) => {
     
 })
 
+router.get('/category/event/up-coming', async (req, res) => {
+    Events.findAll(
+        {order:[
+            ['id', 'DESC']
+        ]},
+        {limit: 4}
+    ).then((item) => {
+        res.status(200).json({
+            status:'success',
+            data: item
+        })
+    }).catch((error) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
+})
+
 
 module.exports = router
