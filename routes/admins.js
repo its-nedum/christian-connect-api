@@ -55,14 +55,20 @@ router.post('/music',  async (req, res) => {
 
             //Save the media files in an array
             let media = [image.tempFilePath, music.tempFilePath];
-            for(let singleTemp of media){
-               cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/music'}, async (err, result) => {
+            let resPromise = media.map(singleTemp => new Promise((resolve, reject) => {
+                cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/music'}, (err, result) => {
                     if(err){
                         console.log(err)
+                    }else{
+                        resolve(result.secure_url)
+                        urls.push(result.secure_url)
                     }
-                   await urls.push(result.secure_url)
+                   
                 }) 
-            }
+            }))
+               
+            Promise.all(resPromise)
+            .then((result) => { 
             //Save data to Database
             Musics.create({
                 music_title: musicTitle,
@@ -82,6 +88,12 @@ router.post('/music',  async (req, res) => {
                     error: "Something went wrong, please try again later"
                 })
             })
+
+        }).catch( (error) => {
+            res.status(500).json({
+                error: "Something went wrong, please try again later"
+            })
+        })
         }
 
     }).catch((error) => {
@@ -120,33 +132,46 @@ router.post('/video', async (req, res) => {
 
             //Save the media files in an array
             let media = [image.tempFilePath, video.tempFilePath];
-            for(let singleTemp of media){
-            cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, async (err, result) => {
+            let resPromise = media.map(singleTemp => new Promise((resolve, reject) => {
+                cloudinary.uploader.upload(singleTemp, {resource_type: 'auto', folder: 'Christian Connect/video'}, (err, result) => {
                     if(err){
                         console.log(err)
-                    } console.log(result)
-                   await urls.push(result.secure_url)
+                    } else{
+                        resolve(result.secure_url)
+                        urls.push(result.secure_url)
+                    }
+                   //await urls.push(result.secure_url)
                 }) 
-            }
-            //Save data to Database
-            Videos.create({
-                video_title: videoTitle,
-                video_about: videoAbout,
-                image_url: urls[0],
-                video_url: urls[1],
-                category,
-                uploaded_by: uploadedBy
-            }).then( (video) => {
-                res.status(201).json({
-                    status: "success",
-                    message: 'Video added successfully',
-                    data: video
-                })
-            }).catch((error) => {
+            }))
+            Promise.all(resPromise)
+            .then((result) => { 
+                    //Save data to Database
+                    Videos.create({
+                        video_title: videoTitle,
+                        video_about: videoAbout,
+                        image_url: urls[0],
+                        video_url: urls[1],
+                        category,
+                        uploaded_by: uploadedBy
+                    }).then( (video) => {
+                        res.status(201).json({
+                            status: "success",
+                            message: 'Video added successfully',
+                            data: video
+                        })
+                    }).catch((error) => {
+                        res.status(500).json({
+                            error: "Something went wrong, please try again later"
+                        })
+                    })
+            }).catch( (error) => {
                 res.status(500).json({
                     error: "Something went wrong, please try again later"
                 })
             })
+            
+            
+            
         }
 
     }).catch((error) => {
