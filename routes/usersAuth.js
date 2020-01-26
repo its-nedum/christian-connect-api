@@ -140,7 +140,7 @@ router.post('/signin', async (req, res) => {
                     const name = user.firstname + ' ' + user.lastname;
                     const username = user.username;
                     const userId = user.id;
-                    jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'}, (err, token) => {
+                    jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '1'}, (err, token) => {
                         if(err) { console.log(err) }
 
                         res.status(200).json({

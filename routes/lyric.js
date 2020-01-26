@@ -18,7 +18,7 @@ router.get('/category/lyric',  async (req, res) => {
         if(!item){
             return res.status(200).json({
                 status: "success",
-                data: "No job posted yet"
+                data: "No lyric posted yet"
             })
         }
 
