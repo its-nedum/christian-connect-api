@@ -2,7 +2,7 @@
 const getUserId = require('../helpers/getUserId')
 // Import Model 
 Requests = require('../models/Requests'); 
-Friends = require('../models/Friends')
+Friends = require('../models/Friends');
 
 
 module.exports = { 
