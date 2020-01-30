@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 require('dotenv').config();
 const cors = require('cors')
 const app = express();
 const swaggerUi = require('swagger-ui-express')
 const swaggerDocument = require('./swagger.json')
+
 
 
 //CORS - This allows access from different origin to my API
@@ -21,8 +23,14 @@ app.use((req, res, next) => {
 });
 
 //Setup body-parser middleware
-app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true}));
+
+
+//SETUP FILEUPLOAD
+app.use(fileUpload({
+  useTempFiles: true,
+}));
 
 //API Documentation ROUTE
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -63,9 +71,14 @@ app.use('/api/v1', adminDashboard)
 const adminAuthRouter = require('./routes/adminAuth')
 app.use('/api/v1', adminAuthRouter)
 
-//Send Friend Request Route
+// Friend Request Route {@OluwmayowaF}
 const requestsRouter = require('./routes/requests')
 app.use('/api/v1', requestsRouter)
+
+// Posts Route {@OluwmayowaF}
+const postsRouter = require('./routes/posts')
+app.use('/api/v1', postsRouter)
+
 
 //Home route
 app.get('/api/v1/', (req, res) => {
