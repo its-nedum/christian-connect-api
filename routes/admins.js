@@ -196,15 +196,15 @@ router.post('/lyric', async (req, res) => {
         })
     }
     //Check if lyric exist
-    Lyrics.findOne({
-        where: { lyric_title: lyricTitle }
-    }).then( (item) => {
-        //If lyric exists do this
-        if(item){
-            return res.status(200).json({
-                message: 'Lyrics already exist'
-            })
-        }else{
+    // Lyrics.findOne({
+    //     where: { lyric_title: lyricTitle }
+    // }).then( (item) => {
+    //     //If lyric exists do this
+    //     if(item){
+    //         return res.status(200).json({
+    //             message: 'Lyrics already exist'
+    //         })
+    //     }else{
             //if lyrics does not exist add it
             Lyrics.create({
                 lyric_title: lyricTitle,
@@ -222,12 +222,12 @@ router.post('/lyric', async (req, res) => {
                     error: "Something went wrong, please try again later"
                 })
             })
-        }
-    }).catch((error) => {
-        res.status(500).json({
-            error: "Something went wrong, please try again later"
-        })
-    })
+    //     }
+    // }).catch((error) => {
+    //     res.status(500).json({
+    //         error: "Something went wrong, please try again later"
+    //     })
+    // })
 })
 
 //POST EVENT TO THE DATABASE
