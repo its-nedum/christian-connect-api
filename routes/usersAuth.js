@@ -77,8 +77,10 @@ router.post('/signup', async (req, res) => {
                                 const token = jwt.sign({name, email, username, userId}, process.env.SECRET_TOKEN, {expiresIn: '7d'})
                                 res.status(201).json({
                                     message: 'Account created successfully',
-                                    data: user,
+                                    data: {
+                                    user,
                                     token
+                                    }
                                 })
                             }).catch( (err) => console.log(err))    
                         
