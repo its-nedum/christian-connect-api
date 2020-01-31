@@ -25,6 +25,7 @@ router.get('/category/event',  async (req, res) => {
     
 })
 
+//Get up coming event for the landing page
 router.get('/category/event/up-coming', async (req, res) => {
     Events.findAll(
         {order:[
