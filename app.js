@@ -63,6 +63,10 @@ app.use('/api/v1', eventRouter)
 const jobRouter = require('./routes/jobs')
 app.use('/api/v1', jobRouter)
 
+//SEARCH ROUTE
+const searchRouter = require('./routes/search')
+app.use('/api/v1', searchRouter)
+
 //ADMIN DASHBOARD EXTRA ROUTE
 const adminDashboard = require('./routes/adminDashboard')
 app.use('/api/v1', adminDashboard)
@@ -70,6 +74,7 @@ app.use('/api/v1', adminDashboard)
 //ADMIN AUTH ROUTE
 const adminAuthRouter = require('./routes/adminAuth')
 app.use('/api/v1', adminAuthRouter)
+
 
 // Friend Request Route {@OluwmayowaF}
 const requestsRouter = require('./routes/requests')
