@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const fileUpload = require('express-fileupload')
 const getAdminName = require('../helpers/getAdminName')
 
 //Model CONNECTION
@@ -18,10 +17,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-//SETUP FILEUPLOAD
-router.use(fileUpload({
-    useTempFiles: true
-}))
   
 //POST A SONG TO THE DATABASE
 router.post('/music',  async (req, res) => {
@@ -231,7 +226,7 @@ router.post('/lyric', async (req, res) => {
 })
 
 //POST EVENT TO THE DATABASE
-router.post('/event', async (req, res) => {
+router.post('/event', async (req, res) => { 
     const theme = req.body.theme;
     const organizer = req.body.organizer;
     const ministering = req.body.ministering;
@@ -249,7 +244,7 @@ router.post('/event', async (req, res) => {
     if(!theme || !organizer || !ministering || !venue || !startDate || !endDate
         || !time || !enquiry || !comment || !image){
             return res.status(200).json({
-                message: "All fields are required"
+                message: "All fields are required1"
             })
         }
     //Check if events already exist
