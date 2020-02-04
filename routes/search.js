@@ -10,17 +10,22 @@ const Event = require('../models/Events')
 const Job = require('../models/Jobs')
 
 //SEARCH
-router.post('/search', async (req, res) => {
-let term = req.body.term;
+router.get('/search/:searchItems', async (req, res) => {
+let term = req.params.searchItems;
 
     Music.findAll(
         { where: {music_title: { [Op.like]: '%' + term + '%' } } } )
         .then((items) => {
+            
+            if(!items){
+               return res.status(200).json({
+                    message: 'Nothing was found'
+                })
+            }
+
             res.status(200).json({
                 status: 'success',
-                data: {
-                    results: items
-                }
+                data: items
             })
         })
         .catch( (error) => {
