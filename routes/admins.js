@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const getAdminName = require('../helpers/getAdminName')
+const authenticate = require('../middleware/authenticate')
 
 //Model CONNECTION
 const Musics = require('../models/Musics')
@@ -19,7 +20,7 @@ cloudinary.config({
 
   
 //POST A SONG TO THE DATABASE
-router.post('/music',  async (req, res) => {
+router.post('/music', authenticate, async (req, res) => {
     //Collect form data
     const musicTitle = req.body.musicTitle;
     const musicAbout = req.body.musicAbout;
@@ -99,7 +100,7 @@ router.post('/music',  async (req, res) => {
 })
 
 //POST A VIDEO TO DATABASE
-router.post('/video', async (req, res) => {
+router.post('/video', authenticate, async (req, res) => {
     const videoTitle = req.body.videoTitle;
     const videoAbout = req.body.videoAbout;
     const image = req.files.image;
@@ -179,7 +180,7 @@ router.post('/video', async (req, res) => {
 
 
 //POST LYRIC TO DATABASE
-router.post('/lyric', async (req, res) => {
+router.post('/lyric', authenticate, async (req, res) => {
     const  lyricTitle = req.body.lyricTitle;
     const  lyric = req.body.lyric;
     const category = 'Lyric';
@@ -226,7 +227,7 @@ router.post('/lyric', async (req, res) => {
 })
 
 //POST EVENT TO THE DATABASE
-router.post('/event', async (req, res) => { 
+router.post('/event', authenticate, async (req, res) => { 
     const theme = req.body.theme;
     const organizer = req.body.organizer;
     const ministering = req.body.ministering;
@@ -300,7 +301,7 @@ router.post('/event', async (req, res) => {
 })
 
 //POST JOB TO THE DATABASE
-router.post('/job', async (req, res) => {
+router.post('/job', authenticate, async (req, res) => {
     const position = req.body.position;
     const company = req.body.company;
     const location = req.body.location;

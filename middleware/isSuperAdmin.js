@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const client = require('../database/dbconnect')
+//const client = require('../database/dbconnect')
 
 //Import Model
 const Admins = require('../models/Admins')
@@ -16,7 +16,11 @@ const isSuperAdmin = (req, res, next) => {
         req.token = bearerToken
         
        jwt.verify(req.token, process.env.SECRET_TOKEN, (err, decode) => {
-           if(err){console.log(err)}
+           if(err){
+                res.status(403).json({
+                    message: 'Access denied'
+                });
+            }
            
             Admins.findOne({
                 where: { email: decode.email}
