@@ -35,6 +35,10 @@ app.use(fileUpload({
 //API Documentation ROUTE
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+//POST ROUTE
+const postsRouter = require('./routes/posts')
+app.use('/api/v1', postsRouter)
+
 // ADMINS ROUTE
 const adminRouter = require('./routes/admins')
 app.use('/api/v1', adminRouter)
@@ -75,14 +79,9 @@ app.use('/api/v1', adminDashboard)
 const adminAuthRouter = require('./routes/adminAuth')
 app.use('/api/v1', adminAuthRouter)
 
-
 // Friend Request Route {@OluwmayowaF}
 const requestsRouter = require('./routes/requests')
 app.use('/api/v1', requestsRouter)
-
-// Posts Route {@OluwmayowaF}
-const postsRouter = require('./routes/posts')
-app.use('/api/v1', postsRouter)
 
 
 //Home route
