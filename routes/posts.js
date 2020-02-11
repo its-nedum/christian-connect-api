@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const sequelize = require('sequelize')
 
 // Get logged in Users's Id
 const getUserId = require('../helpers/getUserId')
@@ -81,8 +82,7 @@ router.post('/createpost', async (req, res) => {
 router.get('/posts', async (req, res) => {
     let userId = await getUserId(req);
 
-    // View all Pending request sent by logged in user 
-
+    // View all Pending request sent by logged in user
     Posts.findAll({
         where:{
             owner_id: userId, 

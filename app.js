@@ -83,6 +83,10 @@ app.use('/api/v1', adminAuthRouter)
 const requestsRouter = require('./routes/requests')
 app.use('/api/v1', requestsRouter)
 
+//CONNECT ROUTE
+const connectRouter = require('./routes/connect')
+app.use('/api/v1', connectRouter)
+
 
 //Home route
 app.get('/api/v1/', (req, res) => {
