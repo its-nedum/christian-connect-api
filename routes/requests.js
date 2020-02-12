@@ -7,6 +7,7 @@ const getUserId = require('../helpers/getUserId')
 // Import Model 
 Requests = require('../models/Requests'); 
 Friends = require('../models/Friends');
+Users = require('../models/Users')
 
 
 //Send a friend request 
@@ -14,7 +15,8 @@ router.post('/sendfriendrequest/:requesteeid', async (req, res) => {
 
     let requester_id = await getUserId(req);
     let requestee_id = req.params.requesteeid;
-
+    console.log(requester_id)
+    console.log(requestee_id)
     if( requestee_id == requester_id){
         res.status(400).json({
             message: "You Cannot send a Friend Request to yourself!", 
@@ -83,10 +85,26 @@ router.get('/viewrequestsent', async (req, res) => {
                 message:'You Have not sent any friend requests'
             })
         }else{
-            res.status(200).json({
-                message:'Pending Friend request',
-                data: requests, 
-
+            console.log(requests)
+            let {dataValues} = requests[0]
+            
+            let {id, requester_id, requestee_id, status} = dataValues
+            //Get the users details from the User table
+            
+            Users.findAll({
+                where: { id: requestee_id },
+                attributes: ['id', 'firstname', 'lastname', 'gender', 'state', 'avatar'],
+            }).then((user) => {
+                res.status(200).json({
+                    status: 'success',
+                    message:'Pending Friend request',
+                    data: user
+                })
+            }).catch((err) => {
+                res.status(500).json({
+                    message: ' Something Went wrong, Please try again', 
+                    hint:err,
+                })
             })
         }
     }).catch((err)=>{
