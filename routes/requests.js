@@ -85,27 +85,49 @@ router.get('/viewrequestsent', async (req, res) => {
                 message:'You Have not sent any friend requests'
             })
         }else{
-            console.log(requests)
-            let {dataValues} = requests[0]
+            //Get the Id of all the people that you sent a friend request
+            let allRequesteeId = [];
+            //Get the request Id from the request table
+            let requestIds = [];
             
-            let {id, requester_id, requestee_id, status} = dataValues
-            //Get the users details from the User table
+            requests.map( (item) => {
+                allRequesteeId.push(item.dataValues.requestee_id)
+                requestIds.push(item.dataValues.id)
+            })
+
+            let reqPromise = allRequesteeId.map(requestee_id => new Promise((resolve, reject) => {
+                Users.findOne({
+                    where: { id: requestee_id },
+                    attributes: ['id', 'firstname', 'lastname', 'gender', 'state', 'avatar'],
+                }).then((user) => {
+                    resolve(user)
+                    
+                }).catch((err) => {
+                    res.status(500).json({
+                        message: ' Something Went wrong, Please try again', 
+                        hint:err,
+                    })
+                })
+            }))
             
-            Users.findAll({
-                where: { id: requestee_id },
-                attributes: ['id', 'firstname', 'lastname', 'gender', 'state', 'avatar'],
-            }).then((user) => {
+            Promise.all(reqPromise)
+            .then((user) => {
+                
                 res.status(200).json({
                     status: 'success',
                     message:'Pending Friend request',
-                    data: user
+                    data: {
+                        user,
+                        requestIds
+                    }
                 })
             }).catch((err) => {
                 res.status(500).json({
-                    message: ' Something Went wrong, Please try again', 
-                    hint:err,
+                    message: 'Something went wrong, Please try again',
+                    hint: err
                 })
             })
+            
         }
     }).catch((err)=>{
         res.status(500).json({
@@ -133,10 +155,46 @@ router.get('/viewrequestreceived', async (req, res) => {
                 message:'No Pending Friend Requests for this user'
             })
         }else{
-            res.status(200).json({
-                message:'Pending Friend Requests',
-                data: requests,
+            //Get the Id of all the people that you sent a friend request
+            let allRequesterId = [];
+            //Get the request Id from the request table
+            let requestIds = [];
+            
+            requests.map( (item) => {
+                allRequesterId.push(item.dataValues.requester_id)
+                requestIds.push(item.dataValues.id)
+            })
 
+            let reqPromise = allRequesterId.map(requester_id => new Promise((resolve, reject) => {
+                Users.findOne({
+                    where: { id: requester_id },
+                    attributes: ['id', 'firstname', 'lastname', 'gender', 'state', 'avatar'],
+                }).then((user) => {
+                    resolve(user)
+                    
+                }).catch((err) => {
+                    res.status(500).json({
+                        message: ' Something Went wrong, Please try again', 
+                        hint:err,
+                    })
+                })
+            }))
+            
+            Promise.all(reqPromise)
+            .then((user) => {  
+                res.status(200).json({
+                    status: 'success',
+                    message:'Pending Friend request',
+                    data: {
+                        user,
+                        requestIds
+                    }
+                })
+            }).catch((err) => {
+                res.status(500).json({
+                    message: 'Something went wrong, Please try again',
+                    hint: err
+                })
             })
         }
 
@@ -258,7 +316,6 @@ router.delete('/cancelfriendrequest/:requestid', async (req, res) => {
             res.status(404).json({
                 message:'Friend Request does not exist'
             })
-
 
         }else{
             res.status(200).json({
