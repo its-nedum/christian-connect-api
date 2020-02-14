@@ -110,7 +110,7 @@ router.get('/posts', async (req, res) => {
 });
 
 
-//VIEW FRIENDS POST
+//VIEW FRIENDS POST INCLUDING YOURS
 router.get('/feed', async (req, res) => {
     let userId = await getUserId(req);
     const Op = sequelize.Op
