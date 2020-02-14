@@ -15,8 +15,8 @@ router.post('/sendfriendrequest/:requesteeid', async (req, res) => {
 
     let requester_id = await getUserId(req);
     let requestee_id = req.params.requesteeid;
-    console.log(requester_id)
-    console.log(requestee_id)
+    // console.log(requester_id)
+    // console.log(requestee_id)
     if( requestee_id == requester_id){
         res.status(400).json({
             message: "You Cannot send a Friend Request to yourself!", 
