@@ -8,6 +8,7 @@ const getUserId = require('../helpers/getUserId')
 // Import Model 
 Posts = require('../models/Posts');
 Friends = require('../models/Friends');
+Users = require('../models/Users')
 ImageUpload = require('../helpers/imageUpload');
 
 const cloudinary = require('cloudinary').v2
@@ -123,22 +124,90 @@ router.get('/feed', async (req, res) => {
 
         }
     }).then((friends)=>{
+        if(!friends){
+            res.status(404).json({
+                message: 'You have not made any connect'
+            })
+        }else{
         let userFriends = []
        friends.map(friend =>{
            userFriends.push(friend.requestee_id, friend.requester_id)
        })
-       Posts.findAll({
-           where:{
-               owner_id: userFriends
-           }
-       }).then((posts) =>{
-        res.status(200).json({
-            message: "Post created succesfully", 
-            data: posts,
-            friends: userFriends,
+
+       let allPostId = []
+       let allOwnerId = []
+       userFriends.map(item => {
+        Posts.findAll({
+            where: {owner_id: item}
+        }).then((onePost)=>{
+            
+            onePost.map((item) => {
+                allPostId.push(item.dataValues.id)
+                allOwnerId.push(item.dataValues.owner_id)
+            }) 
+           //console.log(allOwnerId)
+           let myPromise = allPostId.map(postId => new Promise((resolve,reject) => {
+            Posts.findOne({
+                where: { id: postId},
+                //order: ['id', 'DESC']
+            }).then((post) => {
+                //console.log(post.dataValues)
+                let postOwnerId = post.owner_id;
+                Users.findOne({
+                 where:{ id: postOwnerId},
+                 attributes: ['id', 'firstname', 'lastname']
+                }).then((userInfo) => {
+                    //console.log(userInfo)
+                     const result = {...post.dataValues, ...userInfo.dataValues}
+                     resolve(result)
+                     
+                }).catch((err) => {
+                 res.status(500).json({
+                     message: ' Something Went wrong, Please try again', 
+                     hint:err,
+                 })
+             })
+ 
+            }).catch((err) => {
+                     res.status(500).json({
+                         message: ' Something Went wrong, Please try again', 
+                         hint:err,
+                     })
+                 })
+        }))
+        
+        Promise.all(myPromise)
+        .then((result) => {
+         //console.log(result)
+            res.status(200).json({
+                status: 'success',
+                message: 'Friends and posts',
+                data: result
+            })
+            
+        }).catch((err) => {
+         res.status(502).json({
+             message: ' Something Went wrong, Please try again', 
+             hint:err,
+         })
+     })
+        }).catch((err) => {
+            res.status(500).json({
+                message: ' Something Went wrong, Please try again', 
+                hint:err,
+            })
         })
+
        })
+       
+    }
+    }).catch((err) => {
+        res.status(500).json({
+            message: ' Something Went wrong, Please try again', 
+            hint:err,
+        })
     })
+       
 });
 
 

@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
         if(err){
             let { message } = err;
             if(message == 'jwt expired'){
-               return res.status(401).json({
+               res.status(401).json({
                     message: 'Token expired'
                 })
             }
