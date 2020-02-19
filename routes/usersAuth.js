@@ -173,7 +173,7 @@ router.post('/signin', async (req, res) => {
 
 
 //USER UPDATE ACCOUNT (NOTE: User can not update their email or username)
-router.post('/update-profile', authenticate, async (req, res) => {
+router.patch('/update-profile', authenticate, async (req, res) => {
     let {firstname, lastname, telephone, state, gender, 
          birthdate, country, city, relationship_status,
          work, school, about_me } = req.body;
@@ -237,7 +237,7 @@ router.post('/avatar', authenticate, async (req, res) => {
 
 
 //USER UPDATE PASSWORD
-router.post('/change-password', authenticate, async (req, res) => {
+router.patch('/change-password', authenticate, async (req, res) => {
     let {current_password, new_password, confirm_password} = req.body
     const userId = await getUserId(req)
     //Check whether new password match confirm password
@@ -246,7 +246,7 @@ router.post('/change-password', authenticate, async (req, res) => {
             message: "Password does not match"
         })
     }
-
+ 
     Users.findOne({
         where: {id: userId}
     }).then( (user) => {
@@ -260,7 +260,7 @@ router.post('/change-password', authenticate, async (req, res) => {
                     (hash) => {
                         Users.update({password: hash},
                             {where: {id: userId}}
-                            ).then( () => {
+                            ).then( (result) => {
                                 res.status(201).json({
                                     message: "Password updated successfully"
                                 })
