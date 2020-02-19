@@ -10,6 +10,7 @@ Posts = require('../models/Posts');
 Friends = require('../models/Friends');
 Users = require('../models/Users')
 ImageUpload = require('../helpers/imageUpload');
+Comments = require('../models/Comments')
 
 Users.hasMany(Posts, {foreignKey: 'owner_id'})
 Posts.belongsTo(Users, {foreignKey: 'owner_id'}) 
@@ -201,6 +202,75 @@ router.get('/feed', async (req, res) => {
     })
        
 });
+
+//POST A COMMENT ON A POST
+router.post('/addcommenttopost', async(req,res) => {
+    const owner_id = await getUserId(req)
+    let {post_id, comment} = req.body
+
+    Comments.create({
+        post_id,
+        comment,
+        owner_id
+    }).then((comment) => {
+        res.status(201).json({
+            status: "success",
+            message: "Comment added successfully",
+            data: comment
+        })
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later",
+            hint: err
+            })
+    })
+
+})
+
+
+//VIEW A SINGLE POST 
+router.get('/viewsinglepost/:postId', async(req, res) => {
+    const postId = req.params.postId;
+    
+    Posts.findOne({
+        where: {id: postId},
+        include: [{
+            model: Users,
+        }]
+    }).then((post) => {
+        res.status(200).json({
+            status: "success",
+            message: "Post and comments returned",
+            data: post
+        })
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later",
+            hint: err
+            })
+        })
+})
+
+//GET COMMENT FOR A SINGLE POST
+router.get('/getcomments/:postId', async(req, res) => {
+    const postId = req.params.postId;
+
+    Comments.findAll({
+        where: { post_id: postId}
+        //Add a query to get the users table so we can get the comment owner name and image etc
+    }).then((comments) => {
+        res.status(200).json({
+            status: "success",
+            message: "All comments for the post",
+            data: comments
+        })
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later",
+            hint: err
+            })
+        })
+})
 
 
 module.exports = router
