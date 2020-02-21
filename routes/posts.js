@@ -15,6 +15,9 @@ Comments = require('../models/Comments')
 Users.hasMany(Posts, {foreignKey: 'owner_id'})
 Posts.belongsTo(Users, {foreignKey: 'owner_id'}) 
 
+// Users.hasMany(Comments, {foreignKey: 'owner_id'})
+// Comments.belongsTo(Users, {foreignKey: 'owner_id'})
+
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -258,7 +261,11 @@ router.get('/getcomments/:postId', async(req, res) => {
     Comments.findAll({
         where: { post_id: postId}
         //Add a query to get the users table so we can get the comment owner name and image etc
+        // include: [{
+        //     model: Users
+        // }]
     }).then((comments) => {
+        //console.log(comments)
         res.status(200).json({
             status: "success",
             message: "All comments for the post",

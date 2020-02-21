@@ -14,7 +14,7 @@ const Requests = db.define('requests', {
         type: sequelize.INTEGER, 
         references:{
             model:Users, 
-            key:'id,'
+            key:'id'
         }
     }, 
     status:{
