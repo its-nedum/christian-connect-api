@@ -128,7 +128,6 @@ router.get('/feed', async (req, res) => {
         where:{
             [Op.or]:[{ requester_id: userId},{requestee_id: userId}],
             status: 'active' 
-
         }
     }).then((friends)=>{
         if(!friends){
@@ -140,8 +139,7 @@ router.get('/feed', async (req, res) => {
        friends.map(friend =>{
            userFriends.push(friend.requestee_id, friend.requester_id)
        })
-      
-       
+      //Return all the posts created by user whose id is in userFriends array
         Posts.findAll({
             where: {
                 owner_id: {
@@ -150,9 +148,9 @@ router.get('/feed', async (req, res) => {
             },
             include: [{
                 model: Users,
+                attributes: ['id', 'firstname', 'lastname', 'avatar']
             }] 
         }).then((onePost)=>{
-           
            let result = onePost.map(x=> x.get({plain:true}))
            res.status(200).json({
             status: "success",
@@ -231,7 +229,8 @@ router.get('/getcomments/:postId', async(req, res) => {
     Comments.findAll({
         where: { post_id: postId},
         include: [{
-            model: Users
+            model: Users,
+            attributes: ['id', 'firstname', 'lastname', 'avatar']
         }]
     }).then((comments) => {
     let result = comments.map(x=> x.get({plain:true}))
