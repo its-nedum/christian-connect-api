@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+const sequelize = require('sequelize')
+const Op = sequelize.Op
+
 // Get logged in Users's Id
 const getUserId = require('../helpers/getUserId')
 
@@ -15,8 +18,7 @@ router.post('/sendfriendrequest/:requesteeid', async (req, res) => {
 
     let requester_id = await getUserId(req);
     let requestee_id = req.params.requesteeid;
-    // console.log(requester_id)
-    // console.log(requestee_id)
+    
     if( requestee_id == requester_id){
         res.status(400).json({
             message: "You Cannot send a Friend Request to yourself!", 
@@ -95,12 +97,22 @@ router.get('/viewrequestsent', async (req, res) => {
                 requestIds.push(item.dataValues.id)
             })
 
-            let reqPromise = allRequesteeId.map(requestee_id => new Promise((resolve, reject) => {
-                Users.findOne({
-                    where: { id: requestee_id },
+                Users.findAll({
+                    where: { 
+                        id: {
+                            [Op.in]: allRequesteeId
+                        }
+                     },
                     attributes: ['id', 'firstname', 'lastname', 'gender', 'state', 'avatar'],
                 }).then((user) => {
-                    resolve(user)
+                    res.status(200).json({
+                        status: 'success',
+                        message:'Pending Friend request',
+                        data: {
+                            user,
+                            requestIds
+                        }
+                    })
                     
                 }).catch((err) => {
                     res.status(500).json({
@@ -108,25 +120,6 @@ router.get('/viewrequestsent', async (req, res) => {
                         hint:err,
                     })
                 })
-            }))
-            
-            Promise.all(reqPromise)
-            .then((user) => {
-                
-                res.status(200).json({
-                    status: 'success',
-                    message:'Pending Friend request',
-                    data: {
-                        user,
-                        requestIds
-                    }
-                })
-            }).catch((err) => {
-                res.status(500).json({
-                    message: 'Something went wrong, Please try again',
-                    hint: err
-                })
-            })
             
         }
     }).catch((err)=>{
@@ -165,12 +158,22 @@ router.get('/viewrequestreceived', async (req, res) => {
                 requestIds.push(item.dataValues.id)
             })
 
-            let reqPromise = allRequesterId.map(requester_id => new Promise((resolve, reject) => {
-                Users.findOne({
-                    where: { id: requester_id },
+                Users.findAll({
+                    where: { 
+                        id: {
+                            [Op.in]: allRequesterId
+                        }
+                    },
                     attributes: ['id', 'firstname', 'lastname', 'gender', 'state', 'avatar'],
                 }).then((user) => {
-                    resolve(user)
+                    res.status(200).json({
+                        status: 'success',
+                        message:'Pending Friend request',
+                        data: {
+                            user,
+                            requestIds
+                        }
+                    })
                     
                 }).catch((err) => {
                     res.status(500).json({
@@ -178,24 +181,7 @@ router.get('/viewrequestreceived', async (req, res) => {
                         hint:err,
                     })
                 })
-            }))
             
-            Promise.all(reqPromise)
-            .then((user) => {  
-                res.status(200).json({
-                    status: 'success',
-                    message:'Pending Friend request',
-                    data: {
-                        user,
-                        requestIds
-                    }
-                })
-            }).catch((err) => {
-                res.status(500).json({
-                    message: 'Something went wrong, Please try again',
-                    hint: err
-                })
-            })
         }
 
 }).catch((err) =>{

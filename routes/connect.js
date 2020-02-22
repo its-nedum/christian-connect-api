@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sequelize = require('sequelize')
+const Op = sequelize.Op
 
 const getUserId = require('../helpers/getUserId')
 const Users = require('../models/Users')
@@ -8,6 +9,7 @@ const Friends = require('../models/Friends')
 
 //GET A LIST OF ALL REGISTERED MEMBERS
 router.get('/users', async(req,res) => {
+
     Users.findAll({
         order:[ 
             ['id', 'DESC'] 
@@ -50,7 +52,7 @@ router.get('/users/:username', async (req, res) => {
 //GET A LIST OF ALL MY CONNECTS(Friends)
 router.get('/allMyConnect', async(req, res) => {
     const userId = await getUserId(req);
-    const Op = sequelize.Op
+    
 
     // Filter Posts with friends 
     Friends.findAll({
@@ -73,12 +75,19 @@ router.get('/allMyConnect', async(req, res) => {
                 allFriendRequesterId.push(item.dataValues.requester_id)
             })
 
-            let reqPromise = allFriendRequesterId.map(requester_id => new Promise((resolve, reject) => {
-                Users.findOne({
-                    where: { id: requester_id },
+                Users.findAll({
+                    where: { 
+                        id: {
+                            [Op.in]: allFriendRequesterId
+                        } 
+                    },
                     attributes: ['id', 'firstname', 'lastname', 'username', 'gender', 'state', 'about_me', 'avatar'],
                 }).then((user) => {
-                    resolve(user)
+                    res.status(200).json({
+                        status: 'success',
+                        message:'Meet all your connect',
+                        data: user    
+                    })
                     
                 }).catch((err) => {
                     res.status(500).json({
@@ -86,21 +95,7 @@ router.get('/allMyConnect', async(req, res) => {
                         hint:err,
                     })
                 })
-            }))
-
-            Promise.all(reqPromise)
-            .then((user) => {  
-                res.status(200).json({
-                    status: 'success',
-                    message:'Meet all your connect',
-                    data: user    
-                })
-            }).catch((err) => {
-                res.status(500).json({
-                    message: 'Something went wrong, Please try again',
-                    hint: err
-                })
-            })
+            
         
         }
     }).catch((err) => {
@@ -114,7 +109,6 @@ router.get('/allMyConnect', async(req, res) => {
 //GET A SAMPLE LIST OF ALL MY CONNECTS(Friends)
 router.get('/allMyConnect-sample', async(req, res) => {
     const userId = await getUserId(req);
-    const Op = sequelize.Op
 
     // Filter Posts with friends 
     Friends.findAll({
@@ -139,32 +133,24 @@ router.get('/allMyConnect-sample', async(req, res) => {
                 allFriendRequesterId.push(item.dataValues.requester_id)
             })
 
-            let reqPromise = allFriendRequesterId.map(requester_id => new Promise((resolve, reject) => {
-                Users.findOne({
-                    where: { id: requester_id },
-                    attributes: ['id', 'firstname', 'lastname', 'username', 'gender', 'state', 'about_me', 'avatar'],
-                }).then((user) => {
-                    resolve(user)
-                    
-                }).catch((err) => {
-                    res.status(500).json({
-                        message: ' Something Went wrong, Please try again', 
-                        hint:err,
-                    })
-                })
-            }))
-
-            Promise.all(reqPromise)
-            .then((user) => {  
+            Users.findAll({
+                where: { 
+                    id: {
+                        [Op.in]: allFriendRequesterId
+                    } 
+                },
+                attributes: ['id', 'firstname', 'lastname', 'username', 'gender', 'state', 'about_me', 'avatar'],
+            }).then((user) => {
                 res.status(200).json({
                     status: 'success',
                     message:'Meet all your connect',
                     data: user    
                 })
+                
             }).catch((err) => {
                 res.status(500).json({
-                    message: 'Something went wrong, Please try again',
-                    hint: err
+                    message: ' Something Went wrong, Please try again', 
+                    hint:err,
                 })
             })
         
@@ -175,8 +161,6 @@ router.get('/allMyConnect-sample', async(req, res) => {
         })
     })
 
-    
-    
 })
 
 
