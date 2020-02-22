@@ -141,61 +141,31 @@ router.get('/feed', async (req, res) => {
            userFriends.push(friend.requestee_id, friend.requester_id)
        })
       
-       let allPostId = []
        
-      let postPromise = userFriends.map(item => new Promise((resolve,reject) => {
         Posts.findAll({
-            where: {owner_id: item}
+            where: {
+                owner_id: {
+                    [Op.in]: userFriends
+                }
+            },
+            include: [{
+                model: Users,
+            }] 
         }).then((onePost)=>{
-            onePost.map((item) => {
-                resolve(item.dataValues.id)  
-                allPostId.push(item.dataValues.id)
-            }) 
+           
+           let result = onePost.map(x=> x.get({plain:true}))
+           res.status(200).json({
+            status: "success",
+            message: "All posts from me and my friends",
+            data: result
+        })
         }).catch((err) => {
             res.status(500).json({
                 message: ' Something Went wrong, Please try again', 
                 hint:err,
             })
         })
-      }))
-
-      Promise.all(postPromise).then((result) => {
-        let myPromise = allPostId.map(postId => new Promise((resolve,reject) => {
-            Posts.findOne({
-                where: {id: postId},
-                include: [{
-                    model: Users,
-                }]
-            }).then((result) => {
-                
-                resolve(result)
-                
-            }).catch((err) => {
-                     res.status(500).json({
-                         message: ' Something Went wrong, Please try again', 
-                         hint:err,
-                     })
-                 })
-        }))
-        
-        Promise.all(myPromise)
-        .then((result) => {
-         
-            res.status(200).json({
-                status: 'success',
-                message: 'Friends and posts',
-                data: result
-            })
-            
-        }).catch((err) => {
-         res.status(502).json({
-             message: ' Something Went wrong, Please try again', 
-             hint:err,
-         })
-     })
-      })
-        
-
+      
     }
     }).catch((err) => {
         res.status(500).json({
