@@ -163,5 +163,26 @@ router.get('/allMyConnect-sample', async(req, res) => {
 
 })
 
+//Get the list of our 4 newest member for home page dispaly
+router.get('/getnewestmember', async(req, res) => {
+
+    Users.findAll({
+        order:[
+            ['id', 'DESC']
+        ],
+        attributes: ['id', 'firstname', 'lastname', 'gender', 'state',  'avatar']
+    },{limit: 4}
+    ).then((newest) => {
+        res.status(200).json({
+            status: 'success',
+            message: 'Meet our newest member',
+            data: newest
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
+})
 
 module.exports = router
