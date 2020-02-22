@@ -173,11 +173,18 @@ router.get('/getnewestmember', async(req, res) => {
         attributes: ['id', 'firstname', 'lastname', 'gender', 'state',  'avatar']
     },{limit: 4}
     ).then((newest) => {
+        if(!newest){
+            res.status(404).json({
+                status: 'success',
+                message: 'No user found'
+            })
+        }else{
         res.status(200).json({
             status: 'success',
             message: 'Meet our newest member',
             data: newest
         })
+    }
     }).catch((err) => {
         res.status(500).json({
             error: "Something went wrong, please try again later"
