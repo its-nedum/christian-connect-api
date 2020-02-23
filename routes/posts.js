@@ -18,6 +18,9 @@ Posts.belongsTo(Users, {foreignKey: 'owner_id'})
 Users.hasMany(Comments, {foreignKey: 'owner_id'})
 Comments.belongsTo(Users, {foreignKey: 'owner_id'})
 
+Posts.hasMany(Comments, {foreignKey: 'owner_id'})
+Comments.belongsTo(Posts, {foreignKey: 'owner_id'})
+
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
