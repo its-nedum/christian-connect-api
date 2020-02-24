@@ -209,6 +209,7 @@ router.patch('/update-profile', authenticate, async (req, res) => {
 
 //USER UPLAOD PROFILE PICTURE
 router.post('/avatar', authenticate, async (req, res) => {
+   
     let avatar = req.files.avatar;
     const userId = await getUserId(req)
 
