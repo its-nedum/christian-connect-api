@@ -11,6 +11,7 @@ Friends = require('../models/Friends');
 Users = require('../models/Users')
 ImageUpload = require('../helpers/imageUpload');
 Comments = require('../models/Comments')
+Likes = require('../models/Likes')
 
 Users.hasMany(Posts, {foreignKey: 'owner_id'})
 Posts.belongsTo(Users, {foreignKey: 'owner_id'}) 
@@ -248,6 +249,51 @@ router.get('/getcomments/:postId', async(req, res) => {
             hint: err
             })
         })
+})
+
+
+//LIKE A POST
+router.post('/like/:postId', async (req, res) => {
+    const postId = req.params.postId;
+    const userId = await getUserId(req);
+
+    //Check if the user already liked the post if NO then add to like array else remove the user add from the array 
+    Likes.findOne({
+        where: {
+            post_id: postId,
+        }
+    }).then((likey) => {
+        //If no like for that post then create
+        
+        if(!likey){
+            Likes.create({
+              post_id: postId,
+              likes: userId
+            }).then((liked) => {
+                //write a code to get the total like on this post before you return
+                res.status(201).json({
+                    status: 'success',
+                    message: 'Post liked',
+                    data: liked
+                })
+            }).catch((err) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later",
+                    hint: err
+                    })
+                })
+        
+        }else{
+            //If a Like account for that post exist check if the user id is in the array 
+            let allLike = [];
+            console.log(likey)
+        }
+    }).catch((err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later",
+            hint: err
+            })
+    })
 })
 
 
