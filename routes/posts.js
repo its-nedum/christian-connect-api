@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sequelize = require('sequelize')
+const Op = sequelize.Op
 
 // Get logged in Users's Id
 const getUserId = require('../helpers/getUserId')
@@ -125,7 +126,7 @@ router.get('/posts', async (req, res) => {
 //VIEW FRIENDS POST INCLUDING YOURS
 router.get('/feed', async (req, res) => {
     let userId = await getUserId(req);
-    const Op = sequelize.Op
+    
 
     // Filter Posts with friends 
     Friends.findAll({
@@ -258,19 +259,21 @@ router.post('/like/:postId', async (req, res) => {
     const userId = await getUserId(req);
 
     //Check if the user already liked the post if NO then add to like array else remove the user add from the array 
+    let userArray = [];
+    userArray.push(userId)
     Likes.findOne({
         where: {
             post_id: postId,
         }
     }).then((likey) => {
         //If no like for that post then create
-        
         if(!likey){
             Likes.create({
               post_id: postId,
-              likes: userId
+              like: userId //sequelize.fn('array_append', sequelize.col('like'), userId)
             }).then((liked) => {
                 //write a code to get the total like on this post before you return
+                console.log(liked.dataValues)
                 res.status(201).json({
                     status: 'success',
                     message: 'Post liked',

@@ -12,6 +12,7 @@ const Likes = db.define('likes', {
     }, 
     likes:{
         type: sequelize.ARRAY(sequelize.INTEGER), 
+        defaultValue: null
     }
 })
 
