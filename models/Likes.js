@@ -10,9 +10,8 @@ const Likes = db.define('likes', {
             key:'id',
         }
     }, 
-    likes:{
-        type: sequelize.ARRAY(sequelize.INTEGER), 
-        defaultValue: null
+    like:{
+        type: sequelize.ARRAY(sequelize.INTEGER)
     }
 })
 

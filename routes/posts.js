@@ -259,8 +259,6 @@ router.post('/like/:postId', async (req, res) => {
     const userId = await getUserId(req);
 
     //Check if the user already liked the post if NO then add to like array else remove the user add from the array 
-    let userArray = [];
-    userArray.push(userId)
     Likes.findOne({
         where: {
             post_id: postId,
@@ -270,16 +268,31 @@ router.post('/like/:postId', async (req, res) => {
         if(!likey){
             Likes.create({
               post_id: postId,
-              like: userId //sequelize.fn('array_append', sequelize.col('like'), userId)
             }).then((liked) => {
-                //write a code to get the total like on this post before you return
-                console.log(liked.dataValues)
-                res.status(201).json({
-                    status: 'success',
-                    message: 'Post liked',
-                    data: liked
-                })
+                //update the like array and add the userId
+                Likes.update({
+                    like: sequelize.fn('array_append', sequelize.col('like'), userId)
+                }, 
+                { where: {post_id: postId} }
+                ).then((totalLike) => {
+                    res.status(201).json({
+                        status: 'success',
+                        message: 'Post liked',
+                        data: {
+                            like: liked,
+                            totalLike 
+                        }
+                    })
+                }).catch((err) => {
+                    console.log(err)
+                    res.status(500).json({
+                        error: "Something went wrong, please try again later",
+                        hint: err
+                        })
+                    })
+                
             }).catch((err) => {
+                console.log(err)
                 res.status(500).json({
                     error: "Something went wrong, please try again later",
                     hint: err
@@ -288,10 +301,63 @@ router.post('/like/:postId', async (req, res) => {
         
         }else{
             //If a Like account for that post exist check if the user id is in the array 
-            let allLike = [];
-            console.log(likey)
+            
+            //get the like id and the like array
+            let likeId = likey.dataValues.id;
+            let likes = likey.dataValues.like;
+
+            const checkArray = (item) => {
+                return item === userId
+            }
+            const isAlreadyLiked = likes.find(checkArray)
+
+            if(isAlreadyLiked === userId){
+                //If the user already liked this post then unlike it
+            //let newLikes = likes.filter( like => like != userId)
+            Likes.update(
+                {like: sequelize.fn('array_remove', sequelize.col('like'), userId)},
+               { where: {   id: likeId  } }
+            ).then((unliked) => {
+                res.status(201).json({
+                    status: 'success',
+                    message: 'Post unliked',
+                    data: unliked
+                })
+            }).catch((err) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later",
+                    hint: err
+                    })
+            })
+            }else{
+                //The user has not liked the post then like it
+                //update the like array and add the userId
+                Likes.update({
+                    like: sequelize.fn('array_append', sequelize.col('like'), userId)
+                }, 
+                { where: {post_id: postId} }
+                ).then((totalLike) => {
+                    res.status(201).json({
+                        status: 'success',
+                        message: 'Post liked',
+                        data: {
+                            like: liked,
+                            totalLike 
+                        }
+                    })
+                }).catch((err) => {
+                    console.log(err)
+                    res.status(500).json({
+                        error: "Something went wrong, please try again later",
+                        hint: err
+                        })
+                    })
+                      
+            }
+            
         }
     }).catch((err) => {
+        console.log(err)
         res.status(500).json({
             error: "Something went wrong, please try again later",
             hint: err
