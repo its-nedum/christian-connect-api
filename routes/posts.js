@@ -23,7 +23,7 @@ Comments.belongsTo(Users, {foreignKey: 'owner_id'})
 Posts.hasMany(Comments, {foreignKey: 'owner_id'})
 Comments.belongsTo(Posts, {foreignKey: 'owner_id'})
 
-Posts.hasOne(Likes, {foreignKey: 'post_id'})
+Posts.hasMany(Likes, {foreignKey: 'post_id'})
 Likes.belongsTo(Posts, {foreignKey: 'post_id'})
 
 const cloudinary = require('cloudinary').v2
@@ -157,6 +157,9 @@ router.get('/feed', async (req, res) => {
             include: [{
                 model: Users,
                 attributes: ['id', 'firstname', 'lastname', 'avatar']
+            },{
+                model: Likes,
+                attributes: ['id', 'post_id', 'like']
             }] 
         }).then((onePost)=>{
            let result = onePost.map(x=> x.get({plain:true}))
