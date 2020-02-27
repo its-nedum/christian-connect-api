@@ -23,6 +23,9 @@ Comments.belongsTo(Users, {foreignKey: 'owner_id'})
 Posts.hasMany(Comments, {foreignKey: 'owner_id'})
 Comments.belongsTo(Posts, {foreignKey: 'owner_id'})
 
+Posts.hasOne(Likes, {foreignKey: 'post_id'})
+Likes.belongsTo(Posts, {foreignKey: 'post_id'})
+
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -341,8 +344,7 @@ router.post('/like/:postId', async (req, res) => {
                         status: 'success',
                         message: 'Post liked',
                         data: {
-                            like: liked,
-                            totalLike 
+                            like: totalLike 
                         }
                     })
                 }).catch((err) => {
