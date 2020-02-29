@@ -53,7 +53,6 @@ router.get('/users/:username', async (req, res) => {
 router.get('/allMyConnect', async(req, res) => {
     const userId = await getUserId(req);
     
-
     // Filter Posts with friends 
     Friends.findAll({
         where:{
@@ -70,15 +69,21 @@ router.get('/allMyConnect', async(req, res) => {
             
             //Get the Id of all the people that your friend 
             let allFriendRequesterId = [];
+            let allFriendRequesteeId = [];
 
             friends.map( (item) => {
                 allFriendRequesterId.push(item.dataValues.requester_id)
+                allFriendRequesteeId.push(item.dataValues.requestee_id)
             })
+
+            //merge the two array and remove the logged in user id before querying with the resulting array
+            let arrayCollabo = allFriendRequesterId.concat(allFriendRequesteeId)
+            let arrayToQueryWith = arrayCollabo.filter( theId => theId != userId)
 
                 Users.findAll({
                     where: { 
                         id: {
-                            [Op.in]: allFriendRequesterId
+                            [Op.in]: arrayToQueryWith
                         } 
                     },
                     attributes: ['id', 'firstname', 'lastname', 'username', 'gender', 'state', 'about_me', 'avatar'],
@@ -128,15 +133,21 @@ router.get('/allMyConnect-sample', async(req, res) => {
         }else{
             //Get the Id of all the people that your friend 
             let allFriendRequesterId = [];
+            let allFriendRequesteeId = [];
 
             friends.map( (item) => {
                 allFriendRequesterId.push(item.dataValues.requester_id)
+                allFriendRequesteeId.push(item.dataValues.requestee_id)
             })
+
+            //merge the two array and remove the logged in user id before querying with the resulting array
+            let arrayCollabo = allFriendRequesterId.concat(allFriendRequesteeId)
+            let arrayToQueryWith = arrayCollabo.filter( theId => theId != userId)
 
             Users.findAll({
                 where: { 
                     id: {
-                        [Op.in]: allFriendRequesterId
+                        [Op.in]: arrayToQueryWith
                     } 
                 },
                 attributes: ['id', 'firstname', 'lastname', 'username', 'gender', 'state', 'about_me', 'avatar'],
