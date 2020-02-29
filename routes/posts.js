@@ -130,7 +130,6 @@ router.get('/posts', async (req, res) => {
 router.get('/feed', async (req, res) => {
     let userId = await getUserId(req);
     
-
     // Filter Posts with friends 
     Friends.findAll({
         where:{
@@ -218,13 +217,32 @@ router.get('/viewsinglepost/:postId', async(req, res) => {
         where: {id: postId},
         include: [{
             model: Users,
+            attributes: ['id', 'firstname', 'lastname', 'avatar']
+        },{
+            model: Likes,
+            attributes: ['id', 'post_id', 'like']
         }]
     }).then((post) => {
-        res.status(200).json({
-            status: "success",
-            message: "Post and comments returned",
-            data: post
-        })
+        //Then we query to get all the comments length
+        Comments.findAndCountAll({
+            where: {post_id: postId}
+        }).then((num) => {
+            let numberOfComments = num.count
+            res.status(200).json({
+                status: "success",
+                message: "Post and comments returned",
+                data: {
+                    post,
+                    numberOfComments
+                }
+            })
+        }).catch( (err) => {
+            res.status(500).json({
+                error: "Something went wrong, please try again later",
+                hint: err
+                })
+            })
+        
     }).catch( (err) => {
         res.status(500).json({
             error: "Something went wrong, please try again later",
