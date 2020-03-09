@@ -152,7 +152,9 @@ router.get('/feed', async (req, res) => {
                 owner_id: {
                     [Op.in]: userFriends
                 }
-            },
+            },order:[
+                ['id', 'DESC']
+            ],
             include: [{
                 model: Users,
                 attributes: ['id', 'firstname', 'lastname', 'avatar']
