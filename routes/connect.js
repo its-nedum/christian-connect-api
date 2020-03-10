@@ -121,10 +121,11 @@ router.get('/allMyConnect-sample', async(req, res) => {
             [Op.or]:[{ requester_id: userId},{requestee_id: userId}],
             status: 'active' 
         },
+        limit: 4,
         order:[
             ['id', 'DESC']
         ]
-        },{limit: 4}
+        }
     ).then((friends) => {
         if(!friends){
             res.status(404).json({
@@ -178,11 +179,12 @@ router.get('/allMyConnect-sample', async(req, res) => {
 router.get('/getnewestmember', async(req, res) => {
 
     Users.findAll({
+        limit: 4,
         order:[
             ['id', 'DESC']
         ],
         attributes: ['id', 'firstname', 'lastname', 'gender', 'state',  'avatar']
-    },{limit: 4}
+    },
     ).then((newest) => {
         if(!newest){
             res.status(404).json({
