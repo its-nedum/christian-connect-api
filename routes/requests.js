@@ -322,4 +322,60 @@ router.delete('/cancelfriendrequest/:requestid', async (req, res) => {
 
 });
 
+//Check to know if users are friends or not and take appropriate action with 
+// the connect btn
+router.get('/verifyconnectionstatus/:requesteeid', async(req, res) => {
+    let requesterId = await getUserId(req);
+    let requesteeId = req.params.requesteeid
+    let reqArray = [requesterId, requesteeId]
+    Requests.findOne({
+        where: {
+            requester_id: { [Op.in]: reqArray },
+            requestee_id: { [Op.in]: reqArray },
+            status: 'pending'
+        }
+    }).then((isInRequest) => {
+        if(isInRequest){
+            res.status(200).json({
+                message: 'Your request has not been accepted',
+                data: 'Request pending'
+            })
+        }else{
+            Friends.findOne({
+                where: {
+                    requester_id: { [Op.in]: reqArray },
+                    requestee_id: { [Op.in]: reqArray },
+                    status: 'active'
+                }
+            }).then((isInFriend) => {
+                if(isInFriend){
+                    res.status(200).json({
+                        message: 'You are already friends',
+                        data: 'Disconnect'
+                    })
+                }else{
+                    res.status(200).json({
+                        message: 'Please send a friend request',
+                        data: 'Connect'
+                    })
+                }
+            }).catch((err) => {
+                res.status(500).json({
+                    message:'Something went wrong please try again',
+                    hint: err,
+
+                });
+
+            });
+        }
+    }).catch((err) => {
+        res.status(500).json({
+            message:'Something went wrong please try again',
+            hint: err,
+
+        });
+
+    });
+})
+
 module.exports = router
