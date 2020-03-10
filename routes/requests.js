@@ -322,6 +322,40 @@ router.delete('/cancelfriendrequest/:requestid', async (req, res) => {
 
 });
 
+//Disconnect a friend
+router.delete('/disconnectfriends/:requesteeid', async(req, res) => {
+    let requesterId = await getUserId(req);
+    let requesteeId = req.params.requesteeid;
+    let reqArray = [requesterId, requesteeId]
+    Friends.findOne({
+        where: {
+            requester_id: { [Op.in]: reqArray },
+            requestee_id: { [Op.in]: reqArray },
+            status: 'active'
+        }
+    }).then((friendsToDisconnect) => {
+        if(!friendsToDisconnect){
+            res.status(404).json({
+                message: 'Friend connection does not exist'
+            })
+        }else{
+        const idToDelete = friendsToDisconnect.dataValues.id
+         Friends.destroy({
+             where: { 
+                 id: idToDelete
+                }
+            })   
+        }
+    }).catch((err) => {
+        res.status(500).json({
+            message:'Something went wrong please try again',
+            hint: err,
+
+        });
+
+    });
+})
+
 //Check to know if users are friends or not and take appropriate action with 
 // the connect btn
 router.get('/verifyconnectionstatus/:requesteeid', async(req, res) => {
