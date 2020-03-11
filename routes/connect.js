@@ -58,8 +58,10 @@ router.get('/allMyConnect', async(req, res) => {
         where:{
             [Op.or]:[{ requester_id: userId},{requestee_id: userId}],
             status: 'active' 
-
-        }
+        },
+        order:[ 
+            ['id', 'DESC'] 
+        ]
     }).then((friends) => {
         if(!friends){
             res.status(404).json({
