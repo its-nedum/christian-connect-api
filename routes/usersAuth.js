@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fileUpload = require('express-fileupload')
 const getUserId = require('../helpers/getUserId')
 const authenticate = require('../middleware/authenticate')
 
@@ -18,10 +17,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-//SETUP FILEUPLOAD
-router.use(fileUpload({
-    useTempFiles: true
-}))
+
 
 //test sequelize
 db.authenticate()
@@ -209,7 +205,6 @@ router.patch('/update-profile', authenticate, async (req, res) => {
 
 //USER UPLAOD PROFILE PICTURE
 router.post('/avatar', authenticate, async (req, res) => {
-   
     let avatar = req.files.avatar;
     const userId = await getUserId(req)
 
@@ -219,7 +214,7 @@ router.post('/avatar', authenticate, async (req, res) => {
             })
       }
 
-      cloudinary.uploader.upload(avatar.tempFilePath, async (err, result) => {
+      cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
           if(err) { console.log(err) }
             Users.update({ avatar: result.secure_url},
                 {where: {userId}}
