@@ -402,21 +402,18 @@ router.delete('/deletepost/:postId', async(req, res) =>{
         }
     }).then((post) => {
         if(post.owner_id === userId){
+            
+            res.status(200).json({
+                status: 'success',
+                message: 'Post deleted successfully'
+            })
+
             Posts.destroy({
                 where: {
                     id: postId
                 }
-            }).then((deleted) => {
-                res.status(200).json({
-                    status: 'success',
-                    message: 'Post deleted successfully'
-                })
-            }).catch((err) => {
-                res.status(500).json({
-                    error: "Something went wrong, please try again later",
-                    hint: err
-                })
             })
+                
         }else{
             res.status(403).json({
                 status: 'success',
