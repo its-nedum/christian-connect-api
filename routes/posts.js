@@ -310,7 +310,7 @@ router.post('/like/:postId', async (req, res) => {
                         }
                     })
                 }).catch((err) => {
-                    console.log(err)
+                    
                     res.status(500).json({
                         error: "Something went wrong, please try again later",
                         hint: err
@@ -318,7 +318,7 @@ router.post('/like/:postId', async (req, res) => {
                     })
                 
             }).catch((err) => {
-                console.log(err)
+                
                 res.status(500).json({
                     error: "Something went wrong, please try again later",
                     hint: err
@@ -371,7 +371,7 @@ router.post('/like/:postId', async (req, res) => {
                         }
                     })
                 }).catch((err) => {
-                    console.log(err)
+                    
                     res.status(500).json({
                         error: "Something went wrong, please try again later",
                         hint: err
@@ -382,7 +382,7 @@ router.post('/like/:postId', async (req, res) => {
             
         }
     }).catch((err) => {
-        console.log(err)
+        
         res.status(500).json({
             error: "Something went wrong, please try again later",
             hint: err
@@ -391,4 +391,130 @@ router.post('/like/:postId', async (req, res) => {
 })
 
 
+//Delete a post
+router.delete('/deletepost/:postId', async(req, res) =>{
+    const userId = await getUserId(req);
+    const postId = req.params.postId
+
+    Posts.findOne({
+        where: {
+            id: postId,
+        }
+    }).then((post) => {
+        if(post.owner_id === userId){
+            Posts.destroy({
+                where: {
+                    id: postId
+                }
+            }).then((deleted) => {
+                res.status(200).json({
+                    status: 'success',
+                    message: 'Post deleted successfully'
+                })
+            }).catch((err) => {
+                res.status(500).json({
+                    error: "Something went wrong, please try again later",
+                    hint: err
+                })
+            })
+        }else{
+            res.status(403).json({
+                status: 'success',
+                message: 'You are not authorized to perform this action'
+            })
+        }
+    }).catch((err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later",
+            hint: err
+        })
+    })
+})
+
+//Edit a post
+router.update('/updatepost/:postId', async(req, res) => {
+    const userId = await getUserId(req);
+    const postId = req.params.postId
+    const post = req.body.post
+
+    Posts.findOne({
+        where: {
+            id: postId
+            }
+    }).then((postToUpdate) => {
+        if(!postToUpdate){
+            res.status(404).json({
+                status: 'success',
+                message: 'Post not found'
+            })
+        }else{
+            //verify that the post owner is responsible for this action
+           if(postToUpdate.owner_id === userId){
+               if(!req.files){
+                   //handle post without image
+                    Posts.update({
+                        post
+                    }, {
+                        where: {id: postId}
+                    }).then((post) => {
+                        res.status(200).json({
+                            status: 'success',
+                            message: 'Post updated successfully'
+                        })
+                    }).catch((err) => {
+                        res.status(500).json({
+                            error: "Something went wrong, please try again later",
+                            hint: err
+                        })
+                    })
+               }else{
+                   //handle post with image
+                   let image = req.files.image;
+                   cloudinary.uploader.upload(image.tempFilePath, {folder: 'Christian Connect/images'}, async (err, result) => {
+                       if(err){console.log(err)}
+                       let image_url = result.secure_url;
+
+                   Posts.update({
+                       post,
+                       image_url 
+                   },{
+                       where: {id: postId}
+                    }).then((post) => {
+                        res.status(200).json({
+                            status: 'success',
+                            message: 'Post updated successfully'
+                        })
+                }).catch((err) => {
+                    res.status(500).json({
+                        error: "Something went wrong, please try again later",
+                        hint: err
+                    })
+                })
+
+            })
+
+               }
+           }else{
+                res.status(403).json({
+                    status: 'success',
+                    message: 'You are not authorized to perform this action'
+                })
+           } 
+        }
+    }).catch((err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later",
+            hint: err
+        })
+    })
+
+
+})
+
+
+
+
+
+
 module.exports = router
+
