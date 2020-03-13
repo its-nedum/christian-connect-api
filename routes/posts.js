@@ -219,7 +219,7 @@ router.get('/viewsinglepost/:postId', async(req, res) => {
         where: {id: postId},
         include: [{
             model: Users,
-            attributes: ['id', 'firstname', 'lastname', 'avatar']
+            attributes: ['id', 'firstname', 'lastname', 'username', 'avatar']
         },{
             model: Likes,
             attributes: ['id', 'post_id', 'like']
@@ -432,7 +432,7 @@ router.delete('/deletepost/:postId', async(req, res) =>{
 })
 
 //Edit a post
-router.update('/updatepost/:postId', async(req, res) => {
+router.patch('/updatepost/:postId', async(req, res) => {
     const userId = await getUserId(req);
     const postId = req.params.postId
     const post = req.body.post
