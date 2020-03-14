@@ -376,8 +376,7 @@ router.post('/like/:postId', async (req, res) => {
                         error: "Something went wrong, please try again later",
                         hint: err
                         })
-                    })
-                      
+                    })          
             }
             
         }
@@ -508,7 +507,9 @@ router.patch('/updatepost/:postId', async(req, res) => {
 
 })
 
-
+/*
+* See if we can disconnect relationship before performing delete
+*/
 
 
 
