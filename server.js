@@ -45,3 +45,10 @@ server.on('listening', () => {
 });
 
 server.listen(port);
+
+//Chat script
+const socket = require('socket.io')
+const io = socket(server)
+io.on('connection', (socket) => {
+  console.log('Connection was made', socket.id)
+})
