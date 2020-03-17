@@ -205,19 +205,20 @@ router.patch('/update-profile', authenticate, async (req, res) => {
 
 //USER UPLAOD PROFILE PICTURE
 router.post('/avatar', authenticate, async (req, res) => {
+    
     let avatar = req.files.avatar;
     const userId = await getUserId(req)
-
-    if(avatar.mimetype !== 'image/jpeg' || avatar.mimetype !== 'image/png' || avatar.mimetype !== 'image/jpg') {
-        return res.status(415).json({
-            message: 'Please upload a image file',  
-            })
-      }
+    
+    // if(avatar.mimetype !== 'image/jpeg' || avatar.mimetype !== 'image/png' || avatar.mimetype !== 'image/jpg') {
+    //     return res.status(415).json({
+    //         message: 'Please upload a image file',  
+    //         })
+    //   }
 
       cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
           if(err) { console.log(err) }
             Users.update({ avatar: result.secure_url},
-                {where: {userId}}
+                {where: {id: userId}}
                 ).then( (user) => {
                     res.status(201).json({
                         message: "Profile picture updated successfully"
