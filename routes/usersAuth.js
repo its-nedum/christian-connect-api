@@ -225,12 +225,12 @@ router.post('/avatar', authenticate, async (req, res) => {
         let filename = splittedUrl[splittedUrl.length - 1]
         let splittedFilename = filename.split('.')
         let public_id = splittedFilename[0]
-
+        
         cloudinary.uploader.destroy(public_id, (error, success) => {
           if(error){
               return res.status(404).json({message: 'Something went wrong, please again later'})
           }
-
+            
           cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
             if(err) { return res.status(404).json({message: 'Something went wrong, please again later'}) }
 
@@ -251,7 +251,7 @@ router.post('/avatar', authenticate, async (req, res) => {
     }else{
         cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
             if(err) { return res.status(404).json({message: 'Something went wrong, please again later'}) }
-            
+
               Users.update({ avatar: result.secure_url},
                   {where: {id: userId}}
                   ).then( (user) => {
