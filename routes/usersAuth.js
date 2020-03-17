@@ -205,7 +205,6 @@ router.patch('/update-profile', authenticate, async (req, res) => {
 
 //USER UPLAOD PROFILE PICTURE
 router.post('/avatar', authenticate, async (req, res) => {
-    
     let avatar = req.files.avatar;
     const userId = await getUserId(req)
     
@@ -214,21 +213,65 @@ router.post('/avatar', authenticate, async (req, res) => {
     //         message: 'Please upload a image file',  
     //         })
     //   }
+    
+    //Get the users old profile picture and remove it from cloudinary
+    Users.findOne({
+        where: {id: userId}
+    }).then((theUser) => {
+        let oldImageUrl = theUser.avatar
+        //Check if this a first time upload
+        if(oldImageUrl !== null){
+        let splittedUrl = oldImageUrl.split('/')
+        let filename = splittedUrl[splittedUrl.length - 1]
+        let splittedFilename = filename.split('.')
+        let public_id = splittedFilename[0]
 
-      cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
-          if(err) { console.log(err) }
-            Users.update({ avatar: result.secure_url},
-                {where: {id: userId}}
-                ).then( (user) => {
-                    res.status(201).json({
-                        message: "Profile picture updated successfully"
-                    })
-                }).catch( (err) => {
-                    res.status(500).json({
-                        error: "Something went wrong, please try again later"
-                    })
-                })
-      }) 
+        cloudinary.uploader.destroy(public_id, (error, success) => {
+          if(error){
+              return res.status(404).json({message: 'Something went wrong, please again later'})
+          }
+
+          cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
+            if(err) { return res.status(404).json({message: 'Something went wrong, please again later'}) }
+
+              Users.update({ avatar: result.secure_url},
+                  {where: {id: userId}}
+                  ).then( (user) => {
+                      res.status(201).json({
+                          message: "Profile picture updated successfully"
+                      })
+                  }).catch( (err) => {
+                      res.status(500).json({
+                          error: "Something went wrong, please try again later"
+                      })
+                  })
+        })
+
+        })
+    }else{
+        cloudinary.uploader.upload(avatar.tempFilePath, {resource_type: 'auto', folder: 'Christian Connect/profilepics'}, async (err, result) => {
+            if(err) { return res.status(404).json({message: 'Something went wrong, please again later'}) }
+            
+              Users.update({ avatar: result.secure_url},
+                  {where: {id: userId}}
+                  ).then( (user) => {
+                      res.status(201).json({
+                          message: "Profile picture updated successfully"
+                      })
+                  }).catch( (err) => {
+                      res.status(500).json({
+                          error: "Something went wrong, please try again later"
+                      })
+                  })
+        })
+    }
+    }).catch( (err) => {
+        res.status(500).json({
+            error: "Something went wrong, please try again later"
+        })
+    })
+
+       
 })
 
 
@@ -280,7 +323,7 @@ router.patch('/change-password', authenticate, async (req, res) => {
 
 //GET USER PROFILE
 router.get('/user-details', authenticate, async (req, res) => {
-    const id = await getUserId(req) //req.params.userId;
+    const id = await getUserId(req);
     //Find and return the user account with id = userId
     Users.findOne({
         where: { id }
@@ -296,6 +339,6 @@ router.get('/user-details', authenticate, async (req, res) => {
 
 })
 
-//USER UPDATE PROFILE PICTURE
+
 
 module.exports = router
