@@ -95,4 +95,8 @@ app.get('/api/v1/', (req, res) => {
   })
 })
 
+//Chat
+const chatRouter = require('./chat/chatRouter')
+app.use('/api/v1/', chatRouter)
+
 module.exports = app;
